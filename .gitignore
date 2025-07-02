@@ -1,0 +1,19 @@
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# User-specific files
+*.user
+*.suo
+
+# Build
+bin/
+obj/
+Build/
+build/
+output/
