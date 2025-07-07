@@ -11,6 +11,7 @@ using jelly::core::ManagedResource;
 
 class GLFWWindowSystem : public WindowSystemInterface {
 public:
+    GLFWWindowSystem() = default;
     virtual ~GLFWWindowSystem();
     
     GLFWWindowSystem(const GLFWWindowSystem&) = delete;
