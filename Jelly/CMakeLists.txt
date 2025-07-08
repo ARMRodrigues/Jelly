@@ -6,6 +6,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(DOTNET_SDK "net8.0")
+set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/../Output/${CMAKE_BUILD_TYPE}/${DOTNET_SDK}")
+
 # ----------------------------------------------------------------------
 # Vulkan
 # ----------------------------------------------------------------------
@@ -63,9 +66,17 @@ set(SRC_FILES
 
 add_library(Jelly SHARED ${HEADERS} ${SRC_FILES})
 
+#add_executable(Jelly src/jelly/main.cpp)
+
 # ----------------------------------------------------------------------
 # Includes and Linking
 # ----------------------------------------------------------------------
+set_target_properties(Jelly PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${OUTPUT_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${OUTPUT_DIR}"
+    ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIR}"
+)
+
 target_compile_definitions(Jelly PRIVATE JELLY_BUILD_DLL)
 
 target_include_directories(Jelly PUBLIC 

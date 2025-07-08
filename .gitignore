@@ -16,4 +16,5 @@ bin/
 obj/
 Build/
 build/
+Output/
 output/

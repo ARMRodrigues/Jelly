@@ -41,6 +41,9 @@ bool GLFWWindowSystem::isWindowOpen() const {
 
 void GLFWWindowSystem::pollEvents() {
     glfwPollEvents();
+
+    // TODO : remove, only to debug before having vulkan swapchain
+    glfwSwapBuffers(window_.get());
 }
 
 void GLFWWindowSystem::destroyWindow() {
