@@ -71,6 +71,14 @@ add_library(Jelly SHARED ${HEADERS} ${SRC_FILES})
 # ----------------------------------------------------------------------
 # Includes and Linking
 # ----------------------------------------------------------------------
+# Rename on MinGW (remove lib prefix)
+if(WIN32 AND MINGW)
+    set_target_properties(Jelly PROPERTIES
+        ARCHIVE_OUTPUT_NAME "Jelly"
+        PREFIX ""
+    )
+endif()
+
 set_target_properties(Jelly PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${OUTPUT_DIR}"
     LIBRARY_OUTPUT_DIRECTORY "${OUTPUT_DIR}"
