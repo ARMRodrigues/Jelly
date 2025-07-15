@@ -1,19 +1,21 @@
 #include "jelly/windowing/glfw/glfw_vulkan_window_system.hpp"
 
+#include "jelly/exception.hpp"
+
 #include <iostream>
 
 namespace jelly::windowing::glfw {
 
 void GLFWVulkanWindowSystem::createWindow(const WindowSettings &settings) {
     if (window_) {
-        throw std::runtime_error("Window already created");
+        throw jelly::Exception("Window already created");
     }
-
-    //glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
     if (!glfwInit()) {
-        throw std::runtime_error("Failed to initialize GLFW");
+        throw jelly::Exception("Failed to initialize GLFW");
     }
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
     auto *rawWindow = glfwCreateWindow(settings.width, settings.height, settings.title, nullptr, nullptr);
     
@@ -24,15 +26,16 @@ void GLFWVulkanWindowSystem::createWindow(const WindowSettings &settings) {
 
     if (!rawWindow)
     {
-        throw std::runtime_error("Failed to create Vulkan-compatible GLFW window");
+        throw jelly::Exception("Failed to create Vulkan-compatible GLFW window");
     }
 
     window_ = ManagedResource<GLFWwindow *>(
         rawWindow,
         [](GLFWwindow *w)
         {
-            if (w)
+            if (w) {
                 glfwDestroyWindow(w);
+            }
         },
         nullptr
     );
@@ -40,6 +43,43 @@ void GLFWVulkanWindowSystem::createWindow(const WindowSettings &settings) {
     glfwShowWindow(window_.get());
     glfwRestoreWindow(window_.get());
     glfwFocusWindow(window_.get());
+}
+
+void GLFWVulkanWindowSystem::getFramebufferSize(uint32_t &width, uint32_t &height)
+{
+    int iw, ih;
+    glfwGetFramebufferSize(window_.get(), &iw, &ih);
+    width = static_cast<uint32_t>(iw);
+    height = static_cast<uint32_t>(ih);
+}
+
+void GLFWVulkanWindowSystem::waitEvents()
+{
+    glfwWaitEvents();
+}
+
+void *GLFWVulkanWindowSystem::getNativeWindowHandle()
+{
+    return window_.get();
+}
+
+std::vector<const char *> GLFWVulkanWindowSystem::getVulkanRequiredExtensions()
+{
+    uint32_t count = 0;
+    const char** extensions = glfwGetRequiredInstanceExtensions(&count);
+    return std::vector<const char*>{extensions, extensions + count};
+}
+
+VkSurfaceKHR GLFWVulkanWindowSystem::createVulkanSurface(VkInstance instance)
+{
+    VkSurfaceKHR surface;
+
+    if (glfwCreateWindowSurface(instance, window_.get(), nullptr, &surface) != VK_SUCCESS)
+    {
+        throw jelly::Exception("Failed to create Vulkan surface!");
+    }
+
+    return surface;
 }
 
 }

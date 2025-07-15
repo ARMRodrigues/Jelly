@@ -1,20 +1,22 @@
 #pragma once
 
-#include "jelly/core/graphics_api_type.hpp"
+#include "jelly/core/graphic_api_type.hpp"
 #include "jelly/core/window_settings.hpp"
+#include "jelly/graphics/graphic_api_interface.hpp"
 #include "jelly/windowing/window_system_interface.hpp"
 
 #include <memory>
 
 namespace jelly {
 
-using jelly::core::GraphicsAPIType;
-using jelly::core::WindowSettings;
-using jelly::windowing::WindowSystemInterface;
+using core::GraphicAPIType;
+using core::WindowSettings;
+using graphics::GraphicAPIInterface;
+using windowing::WindowSystemInterface;
 
-/// <summary>
-/// Core engine class responsible for initializing the window and graphics system.
-/// </summary>
+/**
+ * @brief Core engine class responsible for initializing the window and graphics system.
+ */
 class Jelly {
 public:
     Jelly() = default;
@@ -24,44 +26,47 @@ public:
     Jelly(const Jelly&) = delete;
     Jelly& operator=(const Jelly&) = delete;
     Jelly(Jelly&&) = delete;
-    Jelly& operator=(Jelly&&) = delete;
+    Jelly& operator=(Jelly&&) = delete; 
 
-    /// <summary>
-    /// Initializes the engine with the selected graphics API and window settings.
-    /// </summary>
-    /// <param name="graphicsAPIType">The graphics API to use (e.g., Vulkan).</param>
-    /// <param name="windowSettings">Window configuration options.</param>
-    /// <returns>True if initialization succeeded.</returns>
-    bool initialize(GraphicsAPIType graphicsAPIType, const WindowSettings& windowSettings);
+    /**
+    * @brief Initializes the engine with the selected graphics API and window settings.
+    * 
+    * @param graphicsAPIType The graphics API to use (e.g., Vulkan).
+    * @param windowSettings Window configuration options.
+    * @return True if initialization succeeded.
+    */
+    bool initialize(GraphicAPIType graphicAPIType, const WindowSettings& windowSettings);
 
-    /// <summary>
-    /// Returns true if the engine is running in headless mode (no graphics or window).
-    /// </summary>
+    /**
+    * @brief Returns true if the engine is running in headless mode (no graphics or window).
+    */
     bool isHeadless() const;
 
-    /// <summary>
-    /// Returns true if the engine should keep running (i.e., window is still open).
-    /// </summary>
+    /**
+    * @brief Returns true if the engine should keep running (i.e., window is still open).
+    */
     bool isRunning() const;
 
-    /// <summary>
-    /// Polls input and window events (e.g., keyboard, resize, close).
-    /// </summary>
+    /**
+    * @brief Polls input and window events (e.g., keyboard, resize, close).
+    */
     void pollEvents();
 
-    /// <summary>
-    /// Renders a single frame (calls beginFrame/endFrame internally).
-    /// </summary>
+    /**
+    * @brief Renders a single frame (calls beginFrame/endFrame internally).
+    */
     void render();
 
-    /// <summary>
-    /// Shuts down the engine and releases all resources.
-    /// </summary>
+    /**
+    * @brief Shuts down the engine and releases all resources
+    */
     void shutdown();
 
 private:
     bool isHeadless_ = false;
+    
     std::unique_ptr<WindowSystemInterface> windowSystem_;
+    std::unique_ptr<GraphicAPIInterface> graphicAPI_;
 };
 
 }

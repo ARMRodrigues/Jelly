@@ -1,7 +1,7 @@
 #include "jelly_api/jelly.h"
 
 #include "jelly/jelly.hpp"
-#include "jelly/core/graphics_api_type.hpp"
+#include "jelly/core/graphic_api_type.hpp"
 #include "jelly/core/window_settings.hpp"
 
 #include <string>
@@ -11,13 +11,13 @@
 
 namespace {
 
-using jelly::core::GraphicsAPIType;
+using jelly::core::GraphicAPIType;
 
 // -----------------------------------------------------------------------------
 // Converts a string to lowercase and returns the corresponding GraphicsAPIType enum.
 // Throws std::invalid_argument if the API is not recognized.
 // -----------------------------------------------------------------------------
-GraphicsAPIType ParseGraphicsAPIType(const char *name) {
+GraphicAPIType ParseGraphicsAPIType(const char *name) {
     std::string lower{name};
     std::transform(
         lower.begin(), lower.end(), lower.begin(),
@@ -26,13 +26,13 @@ GraphicsAPIType ParseGraphicsAPIType(const char *name) {
     });
 
     if (lower == "noapi") {
-        return GraphicsAPIType::NoApi;
+        return GraphicAPIType::NoApi;
     }
     if (lower == "opengl") {
-        return GraphicsAPIType::OpenGL;
+        return GraphicAPIType::OpenGL;
     }
     if (lower == "vulkan") {
-        return GraphicsAPIType::Vulkan;
+        return GraphicAPIType::Vulkan;
     }
 
     throw std::runtime_error("Unknown Graphics API: " + lower);
@@ -53,7 +53,7 @@ JELLY_API int jelly_initialize(JellyHandle* engineHandle, int width, int height,
 
     jelly::core::WindowSettings settings = {width, height, vsync, title};
 
-    GraphicsAPIType apiNameEnum;
+    GraphicAPIType apiNameEnum;
     try
     {
         apiNameEnum = ParseGraphicsAPIType(apiName);
@@ -64,7 +64,7 @@ JELLY_API int jelly_initialize(JellyHandle* engineHandle, int width, int height,
         return 0;
     }
 
-    return engineHandle->instance.initialize(static_cast<jelly::core::GraphicsAPIType>(apiNameEnum), settings);
+    return engineHandle->instance.initialize(static_cast<jelly::core::GraphicAPIType>(apiNameEnum), settings);
 }
 
 JELLY_API int jelly_is_running(JellyHandle* engine) {

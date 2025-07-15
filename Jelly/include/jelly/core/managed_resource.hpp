@@ -36,6 +36,9 @@ public:
         return *this;
     }
 
+    T& ref() { return resource_; }
+    const T& ref() const { return resource_; }
+
     /// <summary>
     /// Resets the managed resource, invoking the cleanup function if necessary.
     /// </summary>

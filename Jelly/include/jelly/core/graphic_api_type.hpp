@@ -2,7 +2,7 @@
 
 namespace jelly::core {
 
-enum GraphicsAPIType {
+enum GraphicAPIType {
     NoApi,
     OpenGL,
     Vulkan

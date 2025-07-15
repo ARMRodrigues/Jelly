@@ -5,7 +5,7 @@ namespace JellyEngine;
 public class JellyApplication
 {
     Jelly _jellyEngine;
-    
+
     public JellyApplication()
     {
         _jellyEngine = JellyNative.Create();
@@ -18,8 +18,9 @@ public class JellyApplication
         while (_jellyEngine.IsRunning)
         {
             _jellyEngine.PollEvents();
+            _jellyEngine.Render();
         }
-        
+
         _jellyEngine.Dispose();
     }
 }
