@@ -12,12 +12,12 @@ public static class JellyNative
         unsafe
         {
             var handle = JellyInterop.JellyCreate();
-            
+
             if (handle == null)
             {
                 throw new Exception("Failed to create Jelly Engine");
             }
-            
+
             return new Jelly(handle);
         }
     }

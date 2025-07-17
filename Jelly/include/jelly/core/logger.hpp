@@ -19,6 +19,10 @@ public:
     /// @param level The severity level of the log.
     /// @param message The message to display.
     static void Log(LogLevel level, const std::string& message);
+
+    /// Logs a info message.
+    /// @param message The message to display.
+    static void Log(const std::string& message);
 };
 
 }

@@ -27,6 +27,31 @@ static std::string CurrentTimeHHMMSS() {
     return oss.str();
 }
 
+void Logger::Log(const std::string& message) {
+    const std::string timeStr = CurrentTimeHHMMSS();
+
+#if defined(_WIN32) || defined(_WIN64)
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    WORD color = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+
+    SetConsoleTextAttribute(hConsole, color);
+
+    std::cout << "[" << timeStr << "] ";
+
+    std::cout << "[INFO] ";
+
+    std::cout << message << std::endl;
+
+    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+#else
+    const char* colorCode = "\033[32m";
+
+    const char* levelStr = "[INFO] ";
+
+    std::cout << colorCode << "[" << timeStr << "] " << levelStr << message << "\033[0m" << std::endl;
+#endif
+}
+
 // -----------------------------------------------------------------------------
 // Logs a message with platform-specific colored output and timestamp.
 // -----------------------------------------------------------------------------

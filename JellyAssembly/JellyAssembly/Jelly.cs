@@ -1,6 +1,8 @@
+using System.Runtime.InteropServices;
+
 namespace JellyAssembly;
 
-public sealed class Jelly : IDisposable
+public sealed partial class Jelly : IDisposable
 {
     private readonly unsafe JellyHandle* _jellyHandle;
 
@@ -8,7 +10,7 @@ public sealed class Jelly : IDisposable
     {
         _jellyHandle = jellyHandle;
     }
-    
+
     public bool Initialize(int width, int height, bool vsync, string title, string apiName)
     {
         unsafe
@@ -26,7 +28,7 @@ public sealed class Jelly : IDisposable
             }
         }
     }
-    
+
     public bool IsRunning
     {
         get

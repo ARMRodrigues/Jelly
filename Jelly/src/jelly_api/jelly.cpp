@@ -1,5 +1,7 @@
 #include "jelly_api/jelly.h"
 
+#include "jelly_api/jelly_handle.h"
+
 #include "jelly/jelly.hpp"
 #include "jelly/core/graphic_api_type.hpp"
 #include "jelly/core/window_settings.hpp"
@@ -39,10 +41,6 @@ GraphicAPIType ParseGraphicsAPIType(const char *name) {
 }
 
 }
-
-struct JellyHandle final {
-    jelly::Jelly instance;
-};
 
 JELLY_API JellyHandle* jelly_create() {
     return new JellyHandle();

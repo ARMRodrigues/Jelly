@@ -2,6 +2,7 @@
 
 #include "jelly/core/graphic_api_type.hpp"
 #include "jelly/core/window_settings.hpp"
+#include "jelly/core/scene_manager.hpp"
 #include "jelly/graphics/graphic_api_interface.hpp"
 #include "jelly/windowing/window_system_interface.hpp"
 
@@ -11,6 +12,7 @@ namespace jelly {
 
 using core::GraphicAPIType;
 using core::WindowSettings;
+using core::SceneManager;
 using graphics::GraphicAPIInterface;
 using windowing::WindowSystemInterface;
 
@@ -62,11 +64,15 @@ public:
     */
     void shutdown();
 
+    // Getters
+    SceneManager& getSceneManager();
+
 private:
     bool isHeadless_ = false;
     
     std::unique_ptr<WindowSystemInterface> windowSystem_;
     std::unique_ptr<GraphicAPIInterface> graphicAPI_;
+    std::unique_ptr<SceneManager> sceneManager_;
 };
 
 }

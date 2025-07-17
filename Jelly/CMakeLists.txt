@@ -27,6 +27,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw)
 
+# entt
+FetchContent_Declare(
+  entt
+  GIT_REPOSITORY https://github.com/skypjack/entt.git
+  GIT_TAG        v3.15.0
+)
+FetchContent_MakeAvailable(entt)
+
 # ----------------------------------------------------------------------
 # Library
 # ----------------------------------------------------------------------
@@ -38,11 +46,14 @@ set(API_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/jelly_api)
 
 set(API_HEADER_FILES
     ${API_HEADER_DIR}/jelly_api_export.h
+    ${API_HEADER_DIR}/jelly_handle.h
     ${API_HEADER_DIR}/jelly.h
+    ${API_HEADER_DIR}/scene_manager.h
 )
 
 set(API_SOURCE_FILES
     ${API_SRC_DIR}/jelly.cpp
+    ${API_SRC_DIR}/scene_manager.cpp
 )
 
 set(HEADERS
@@ -53,6 +64,9 @@ set(HEADERS
     ${HEADER_DIR}/core/managed_resource.hpp
     ${HEADER_DIR}/core/window_settings.hpp
     ${HEADER_DIR}/core/graphic_api_type.hpp
+    ${HEADER_DIR}/core/game_system_interface.hpp
+    ${HEADER_DIR}/core/scene.hpp
+    ${HEADER_DIR}/core/scene_manager.hpp
     ${HEADER_DIR}/graphics/graphic_api_interface.hpp
     ${HEADER_DIR}/graphics/graphic_api_factory.hpp
     ${HEADER_DIR}/graphics/vulkan/vulkan_graphic_api.hpp
@@ -71,6 +85,8 @@ set(HEADERS
 set(SRC_FILES
     ${SRC_DIR}/jelly.cpp
     ${SRC_DIR}/core/logger.cpp
+    ${SRC_DIR}/core/scene.cpp
+    ${SRC_DIR}/core/scene_manager.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_instance.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_surface.cpp
@@ -119,4 +135,5 @@ target_include_directories(Jelly PUBLIC
 target_link_libraries(Jelly PUBLIC
     glfw
     Vulkan::Vulkan
+    EnTT
 )

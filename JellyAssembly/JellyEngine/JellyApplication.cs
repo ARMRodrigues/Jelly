@@ -4,23 +4,28 @@ namespace JellyEngine;
 
 public class JellyApplication
 {
-    Jelly _jellyEngine;
-
     public JellyApplication()
     {
-        _jellyEngine = JellyNative.Create();
+        JellyCore.Initialize();
+
+        JellyCore.Instance!.Initialize(1280, 720, true, "JellyEngine", "Vulkan");
+
     }
 
     public void Play()
     {
-        _jellyEngine.Initialize(1280, 720, true, "JellyEngine", "Vulkan");
+        var jelly = JellyCore.Instance!;
 
-        while (_jellyEngine.IsRunning)
+        var testScene = new Scene("TestScene");
+
+        SceneManager.SetCurrentScene(testScene.SceneId);
+
+        while (jelly.IsRunning)
         {
-            _jellyEngine.PollEvents();
-            _jellyEngine.Render();
+            jelly.PollEvents();
+            jelly.Render();
         }
 
-        _jellyEngine.Dispose();
+        jelly.Dispose();
     }
 }
