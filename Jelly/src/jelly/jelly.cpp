@@ -1,8 +1,9 @@
 #include "jelly/jelly.hpp"
 
 #include "jelly/exception.hpp"
-#include "jelly/windowing/window_system_factory.hpp"
+#include "jelly/graphics/graphic_context.hpp"
 #include "jelly/graphics/graphic_api_factory.hpp"
+#include "jelly/windowing/window_system_factory.hpp"
 #include "jelly/windowing/window_graphic_api_binder.hpp"
 
 namespace jelly {
@@ -36,6 +37,8 @@ bool Jelly::initialize(GraphicAPIType graphicAPIType, const WindowSettings &wind
     }
     
     graphicAPI_->initialize();
+
+    graphics::GraphicContext::get().initialize(graphicAPIType, graphicAPI_.get());
 
     return true;
 }
@@ -78,4 +81,4 @@ SceneManager& Jelly::getSceneManager() {
     return *sceneManager_;
 }
 
-}
+} // namespace jelly

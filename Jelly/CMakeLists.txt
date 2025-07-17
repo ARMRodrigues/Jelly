@@ -69,6 +69,7 @@ set(HEADERS
     ${HEADER_DIR}/core/scene_manager.hpp
     ${HEADER_DIR}/graphics/graphic_api_interface.hpp
     ${HEADER_DIR}/graphics/graphic_api_factory.hpp
+    ${HEADER_DIR}/graphics/graphic_context.hpp
     ${HEADER_DIR}/graphics/vulkan/vulkan_graphic_api.hpp
     ${HEADER_DIR}/graphics/vulkan/queue_family_indices.hpp
     ${HEADER_DIR}/graphics/vulkan/swap_chain_support_details.hpp
@@ -87,6 +88,7 @@ set(SRC_FILES
     ${SRC_DIR}/core/logger.cpp
     ${SRC_DIR}/core/scene.cpp
     ${SRC_DIR}/core/scene_manager.cpp
+    ${SRC_DIR}/graphics/graphic_context.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_instance.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_surface.cpp
