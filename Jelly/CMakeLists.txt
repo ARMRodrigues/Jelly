@@ -70,9 +70,13 @@ set(HEADERS
     ${HEADER_DIR}/graphics/graphic_api_interface.hpp
     ${HEADER_DIR}/graphics/graphic_api_factory.hpp
     ${HEADER_DIR}/graphics/graphic_context.hpp
+    ${HEADER_DIR}/graphics/shader_interface.hpp
+    ${HEADER_DIR}/graphics/shader_factory.hpp
     ${HEADER_DIR}/graphics/vulkan/vulkan_graphic_api.hpp
     ${HEADER_DIR}/graphics/vulkan/queue_family_indices.hpp
     ${HEADER_DIR}/graphics/vulkan/swap_chain_support_details.hpp
+    ${HEADER_DIR}/graphics/vulkan/vulkan_shader_module.hpp
+    ${HEADER_DIR}/graphics/vulkan/vulkan_shader.hpp
     ${HEADER_DIR}/windowing/window_system_interface.hpp
     ${HEADER_DIR}/windowing/native_window_handle_provider_interface.hpp
     ${HEADER_DIR}/windowing/vulkan_native_window_handle_provider.hpp
@@ -89,6 +93,7 @@ set(SRC_FILES
     ${SRC_DIR}/core/scene.cpp
     ${SRC_DIR}/core/scene_manager.cpp
     ${SRC_DIR}/graphics/graphic_context.cpp
+    ${SRC_DIR}/graphics/shader_factory.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_instance.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_surface.cpp
@@ -102,6 +107,7 @@ set(SRC_FILES
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_command_buffers.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_sync_objects.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_helpers.cpp
+    ${SRC_DIR}/graphics/vulkan/vulkan_shader_module.cpp
     ${SRC_DIR}/windowing/glfw/glfw_window_system.cpp
     ${SRC_DIR}/windowing/glfw/glfw_vulkan_window_system.cpp
     ${API_SOURCE_FILES}
