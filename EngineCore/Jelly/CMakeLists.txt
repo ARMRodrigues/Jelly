@@ -1,22 +1,11 @@
-cmake_minimum_required (VERSION 3.16)
+project(Jelly LANGUAGES CXX)
 
-project(Jelly CXX)
+# Dependencies
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-set(DOTNET_SDK "net8.0")
-set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/../Output/${CMAKE_BUILD_TYPE}/${DOTNET_SDK}")
-
-# ----------------------------------------------------------------------
 # Vulkan
-# ----------------------------------------------------------------------
 find_package(Vulkan REQUIRED)
 
-# ----------------------------------------------------------------------
-# FetchContent
-# ----------------------------------------------------------------------
+# FetchContent for GLFW and EnTT
 include(FetchContent)
 
 # GLFW
@@ -27,35 +16,20 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw)
 
-# entt
+# EnTT
 FetchContent_Declare(
-  entt
-  GIT_REPOSITORY https://github.com/skypjack/entt.git
-  GIT_TAG        v3.15.0
+    entt
+    GIT_REPOSITORY https://github.com/skypjack/entt.git
+    GIT_TAG        v3.15.0
 )
 FetchContent_MakeAvailable(entt)
 
-# ----------------------------------------------------------------------
-# Library
-# ----------------------------------------------------------------------
+# Source/header directories
+
 set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/jelly)
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/jelly)
 
-set(API_HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/jelly_api)
-set(API_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/jelly_api)
-
-set(API_HEADER_FILES
-    ${API_HEADER_DIR}/jelly_api_export.h
-    ${API_HEADER_DIR}/jelly_handle.h
-    ${API_HEADER_DIR}/jelly.h
-    ${API_HEADER_DIR}/scene_manager.h
-)
-
-set(API_SOURCE_FILES
-    ${API_SRC_DIR}/jelly.cpp
-    ${API_SRC_DIR}/scene_manager.cpp
-)
-
+# Header files (optional, used for IDE organization and install)
 set(HEADERS
     ${HEADER_DIR}/jelly.hpp
     ${HEADER_DIR}/error.hpp
@@ -84,9 +58,9 @@ set(HEADERS
     ${HEADER_DIR}/windowing/window_graphic_api_binder.hpp
     ${HEADER_DIR}/windowing/glfw/glfw_window_system.hpp
     ${HEADER_DIR}/windowing/glfw/glfw_vulkan_window_system.hpp
-    ${API_HEADER_FILES}
 )
 
+# Source files
 set(SRC_FILES
     ${SRC_DIR}/jelly.cpp
     ${SRC_DIR}/core/logger.cpp
@@ -110,17 +84,12 @@ set(SRC_FILES
     ${SRC_DIR}/graphics/vulkan/vulkan_shader_module.cpp
     ${SRC_DIR}/windowing/glfw/glfw_window_system.cpp
     ${SRC_DIR}/windowing/glfw/glfw_vulkan_window_system.cpp
-    ${API_SOURCE_FILES}
 )
 
-add_library(Jelly SHARED ${HEADERS} ${SRC_FILES})
+# Library target
+add_library(Jelly SHARED ${SRC_FILES} ${HEADERS})
 
-#add_executable(Jelly src/jelly/main.cpp)
-
-# ----------------------------------------------------------------------
-# Includes and Linking
-# ----------------------------------------------------------------------
-# Rename on MinGW (remove lib prefix)
+# Windows: remove 'lib' prefix when using MinGW
 if(WIN32 AND MINGW)
     set_target_properties(Jelly PROPERTIES
         ARCHIVE_OUTPUT_NAME "Jelly"
@@ -128,18 +97,22 @@ if(WIN32 AND MINGW)
     )
 endif()
 
+# Output directories
 set_target_properties(Jelly PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${OUTPUT_DIR}"
     LIBRARY_OUTPUT_DIRECTORY "${OUTPUT_DIR}"
     ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIR}"
 )
 
+# Preprocessor definitions
 target_compile_definitions(Jelly PRIVATE JELLY_BUILD_DLL)
 
+# Include directories
 target_include_directories(Jelly PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
+# Linked libraries
 target_link_libraries(Jelly PUBLIC
     glfw
     Vulkan::Vulkan

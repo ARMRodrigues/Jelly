@@ -1,5 +1,6 @@
 #pragma once
 
+#include "jelly/jelly_export.hpp"
 #include "jelly/core/graphic_api_type.hpp"
 #include "jelly/core/window_settings.hpp"
 #include "jelly/core/scene_manager.hpp"
@@ -19,7 +20,7 @@ using windowing::WindowSystemInterface;
 /**
  * @brief Core engine class responsible for initializing the window and graphics system.
  */
-class Jelly {
+class JELLY_EXPORT Jelly {
 public:
     Jelly() = default;
     ~Jelly() = default;
