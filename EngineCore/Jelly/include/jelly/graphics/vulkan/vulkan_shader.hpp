@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vulkan_shader_module.hpp"
+#include "jelly/jelly_export.hpp"
 #include "jelly/graphics/shader_interface.hpp"
 
 #include <memory>
@@ -11,7 +12,7 @@ namespace jelly::graphics::vulkan {
 ///
 /// This class implements the `ShaderInterface` and holds ownership of both vertex and fragment shaders.
 /// It is used as the backend representation of a shader program in Vulkan.
-class VulkanShader : public graphics::ShaderInterface {
+class JELLY_EXPORT VulkanShader : public graphics::ShaderInterface {
 public:
     /// @brief Constructs a Vulkan shader program with vertex and fragment shader modules.
     ///
@@ -20,7 +21,11 @@ public:
     VulkanShader(
         std::unique_ptr<VulkanShaderModule> vertex,
         std::unique_ptr<VulkanShaderModule> fragment)
-        : vertex_(std::move(vertex)), fragment_(std::move(fragment)) {}
+        : vertex_(std::move(vertex)), fragment_(std::move(fragment)) {
+            if (!fragment_) {
+                throw std::runtime_error("Fragment shader module is nullptr after VulkanShader construction");
+            }
+        }
 
     /// @brief Binds the shader program for rendering.
     ///
@@ -34,11 +39,17 @@ public:
 
     /// @brief Returns the vertex shader module.
     /// @return Pointer to the vertex `VulkanShaderModule`.
-    const VulkanShaderModule* getVertexModule() const { return vertex_.get(); }
+    const VulkanShaderModule* getVertexModule() const { 
+        if (!vertex_) throw std::runtime_error("Vertex shader module is null");
+        return vertex_.get();
+    }
 
     /// @brief Returns the fragment shader module.
     /// @return Pointer to the fragment `VulkanShaderModule`.
-    const VulkanShaderModule* getFragmentModule() const { return fragment_.get(); }
+    const VulkanShaderModule* getFragmentModule() const {
+        if (!fragment_) throw std::runtime_error("Fragment shader module is null");
+        return fragment_.get();
+    }
 
 private:
     std::unique_ptr<VulkanShaderModule> vertex_;   ///< Vertex shader module.

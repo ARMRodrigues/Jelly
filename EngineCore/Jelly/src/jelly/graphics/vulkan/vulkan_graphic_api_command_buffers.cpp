@@ -23,9 +23,10 @@ void VulkanGraphicAPI::createCommandBuffers() {
     }
 }
 
-void VulkanGraphicAPI::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
-{
+void VulkanGraphicAPI::beginCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
     VkCommandBufferBeginInfo beginInfo{VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};
+
+    vkResetCommandBuffer(commandBuffer, 0);
 
     vkBeginCommandBuffer(commandBuffer, &beginInfo);
 
@@ -40,9 +41,9 @@ void VulkanGraphicAPI::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32
     renderPassInfo.pClearValues = &clearColor;
 
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+}
 
-    // TODO: vkCmdDraw / vkCmdBindPipeline etc aqui...
-
+void VulkanGraphicAPI::endCommandBuffer(VkCommandBuffer commandBuffer) {
     vkCmdEndRenderPass(commandBuffer);
     vkEndCommandBuffer(commandBuffer);
 }

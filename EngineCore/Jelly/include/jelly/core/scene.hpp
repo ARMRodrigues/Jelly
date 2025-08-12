@@ -1,5 +1,6 @@
 #pragma once
 
+#include "jelly/jelly_export.hpp"
 #include "jelly/core/game_system_interface.hpp"
 
 #include <entt/entt.hpp>
@@ -15,7 +16,7 @@ namespace jelly::core {
 /// 
 /// A Scene manages an EnTT registry and a collection of game systems.
 /// It provides a standard update lifecycle.
-class Scene {
+class JELLY_EXPORT Scene {
 public:
     /// @brief Constructs a scene with the given name.
     /// @param name The name of the scene.

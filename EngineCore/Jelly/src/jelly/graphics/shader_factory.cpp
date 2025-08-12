@@ -4,6 +4,8 @@
 #include "jelly/graphics/vulkan/vulkan_shader.hpp"
 #include "jelly/graphics/vulkan/vulkan_graphic_api.hpp"
 
+#include <iostream>
+
 namespace jelly::graphics {
 
 std::shared_ptr<ShaderInterface> ShaderFactory::createFromFiles(const std::string& shaderPath) {
@@ -24,21 +26,24 @@ std::shared_ptr<ShaderInterface> ShaderFactory::createFromFiles(const std::strin
         auto vertex = std::make_unique<vulkan::VulkanShaderModule>(device, vsCode, VK_SHADER_STAGE_VERTEX_BIT);
         auto fragment = std::make_unique<vulkan::VulkanShaderModule>(device, fsCode, VK_SHADER_STAGE_FRAGMENT_BIT);
 
+        if (!vertex) throw std::runtime_error("Vertex shader unique_ptr is null");
+        if (!fragment) throw std::runtime_error("Fragment shader unique_ptr is null");
+
         return std::make_shared<vulkan::VulkanShader>(std::move(vertex), std::move(fragment));
     }
-
+    
+    
     return nullptr;
 }
 
 std::filesystem::path ShaderFactory::resolveShaderPath(
     const std::string& shaderName,
-    const std::string& stage,     // "vertex" ou "fragment"
-    const std::string& backend)   // "vulkan", "opengl", "directx", etc.
+    const std::string& stage,
+    const std::string& backend)
 {
     namespace fs = std::filesystem;
     fs::path basePath = "shaders";
 
-    // Extensão por backend
     std::string extension;
     if (backend == "vulkan") {
         extension = ".spv";

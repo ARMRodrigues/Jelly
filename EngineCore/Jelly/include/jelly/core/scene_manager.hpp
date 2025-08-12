@@ -1,5 +1,6 @@
 #pragma once
 
+#include "jelly/jelly_export.hpp"
 #include "jelly/core/scene.hpp"
 
 #include <memory>
@@ -8,7 +9,7 @@
 
 namespace jelly::core {
 
-class SceneManager {
+class JELLY_EXPORT SceneManager {
 public:
     /// @brief Adds a new scene to the manager.
     /// @param scene A unique pointer to the scene.

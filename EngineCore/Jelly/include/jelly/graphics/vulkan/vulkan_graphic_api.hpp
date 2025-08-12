@@ -3,6 +3,7 @@
 #include "queue_family_indices.hpp"
 #include "swap_chain_support_details.hpp"
 
+#include "jelly/jelly_export.hpp"
 #include "jelly/core/managed_resource.hpp"
 #include "jelly/graphics/graphic_api_interface.hpp"
 #include "jelly/windowing/native_window_handle_provider_interface.hpp"
@@ -17,16 +18,25 @@ namespace jelly::graphics::vulkan {
 using jelly::core::ManagedResource;
 
 /// @brief Vulkan-based implementation of the graphics API.
-/// 
+///
 /// Responsible for initializing Vulkan instance, device, swapchain, render pass, and command infrastructure.
 /// Handles frame rendering and synchronization.
-class VulkanGraphicAPI final : public GraphicAPIInterface {
+class JELLY_EXPORT VulkanGraphicAPI final : public GraphicAPIInterface {
 public:
     /// @brief Initializes the Vulkan graphics backend.
     void initialize() override;
 
     /// @brief Begins a new frame (acquires image, begins command buffer recording, etc.).
     void beginFrame() override;
+
+    /// @brief Begins recording commands into a specific command buffer.
+    /// @param commandBuffer The command buffer to start recording into.
+    /// @param imageIndex The index of the current swapchain image for rendering context.
+    void beginCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+
+    /// @brief Ends the recording of a command buffer.
+    /// @param commandBuffer The command buffer to stop recording.
+    void endCommandBuffer(VkCommandBuffer commandBuffer);
 
     /// @brief Ends the current frame (submits commands and presents the image).
     void endFrame() override;
@@ -45,6 +55,18 @@ public:
     /// @brief Returns the Vulkan render pass used for drawing.
     /// @return The Vulkan render pass handle.
     VkRenderPass getRenderPass() const { return renderPass_.get(); }
+
+    /// @brief Returns the Vulkan physical device.
+    /// @return The Vulkan physical device handle.
+    VkPhysicalDevice getPhysicalDevice() const { return physicalDevice_.get(); }
+
+    /// @brief Returns the command buffer currently being recorded.
+    /// @return The active Vulkan command buffer handle.
+    VkCommandBuffer getCurrentCommandBuffer() const { return commandBuffers[currentImageIndex]; }
+
+    /// @brief Gets the extent (resolution) of the swapchain.
+    /// @return The VkExtent2D representing the swapchain's width and height.
+    VkExtent2D getSwapchainExtent() const { return swapchainExtent; }
 
 private:
     // Window system
@@ -79,6 +101,7 @@ private:
     std::vector<VkSemaphore> imageAvailableSemaphores_;
     std::vector<VkSemaphore> renderFinishedSemaphores_;
     std::vector<VkFence> inFlightFences_;
+    std::vector<VkFence> imagesInFlight_;
 
     // Frame state
     size_t currentFrame = 0;
@@ -124,11 +147,6 @@ private:
 
     /// @brief Destroys swapchain-dependent resources.
     void cleanupSwapchain();
-
-    /// @brief Records commands to draw into the specified command buffer.
-    /// @param commandBuffer The command buffer to record into.
-    /// @param imageIndex Index of the swapchain image being rendered to.
-    void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
     // Helper functions
 

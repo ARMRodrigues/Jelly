@@ -6,35 +6,29 @@ namespace jelly::graphics::vulkan {
 
 void VulkanGraphicAPI::createSyncObjects() {
     for (VkFence f : inFlightFences_) {
-        if (f) {
-            vkDestroyFence(device_, f, nullptr);
-        }
+        if (f) vkDestroyFence(device_, f, nullptr);
     }
 
     for (VkSemaphore s : imageAvailableSemaphores_)
-        if (s)
-            vkDestroySemaphore(device_, s, nullptr);
+        if (s) vkDestroySemaphore(device_, s, nullptr);
     for (VkSemaphore s : renderFinishedSemaphores_)
-        if (s)
-            vkDestroySemaphore(device_, s, nullptr);
+        if (s) vkDestroySemaphore(device_, s, nullptr);
 
     inFlightFences_.clear();
     imageAvailableSemaphores_.clear();
     renderFinishedSemaphores_.clear();
+    imagesInFlight_.clear();
 
-    // 2) Redimensiona corretamente
     inFlightFences_.resize(MaxFramesInFlight, VK_NULL_HANDLE);
     imageAvailableSemaphores_.resize(MaxFramesInFlight, VK_NULL_HANDLE);
     renderFinishedSemaphores_.resize(MaxFramesInFlight, VK_NULL_HANDLE);
+    imagesInFlight_.resize(swapchainImages.size(), VK_NULL_HANDLE);
 
-    // 3) Infos de criação
     VkSemaphoreCreateInfo semInfo{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
     VkFenceCreateInfo fenceInfo{VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    // 4) Use o tamanho real dos vetores para iterar
-    for (std::size_t i = 0; i < inFlightFences_.size(); ++i)
-    {
+    for (std::size_t i = 0; i < inFlightFences_.size(); ++i) {
         if (vkCreateSemaphore(device_, &semInfo, nullptr, &imageAvailableSemaphores_[i]) != VK_SUCCESS ||
             vkCreateSemaphore(device_, &semInfo, nullptr, &renderFinishedSemaphores_[i]) != VK_SUCCESS ||
             vkCreateFence(device_, &fenceInfo, nullptr, &inFlightFences_[i]) != VK_SUCCESS)

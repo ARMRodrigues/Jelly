@@ -1,5 +1,6 @@
 #pragma once
 
+#include "jelly/jelly_export.hpp"
 #include "jelly/graphics/shader_interface.hpp"
 #include "jelly/core/graphic_api_type.hpp"
 
@@ -16,7 +17,7 @@ namespace jelly::graphics {
 ///
 /// This utility abstracts shader loading logic and backend-specific file resolution.
 /// It supports both text (e.g., GLSL) and binary (e.g., SPIR-V) shader formats.
-class ShaderFactory {
+class JELLY_EXPORT ShaderFactory {
 public:
     /// @brief Creates a shader instance for the current graphics API backend.
     ///

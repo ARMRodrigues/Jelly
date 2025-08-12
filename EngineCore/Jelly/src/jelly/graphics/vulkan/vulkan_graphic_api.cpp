@@ -78,31 +78,33 @@ void VulkanGraphicAPI::initialize() {
 }
 
 void VulkanGraphicAPI::beginFrame() {
-    vkWaitForFences(device_, 1, &inFlightFences_[currentFrame], VK_TRUE, UINT64_MAX);
-    vkResetFences(device_, 1, &inFlightFences_[currentFrame]);
-
     VkResult result = vkAcquireNextImageKHR(
-        device_,
-        swapchain_,
-        UINT64_MAX,
-        imageAvailableSemaphores_[currentFrame],
-        VK_NULL_HANDLE,
-        &currentImageIndex);
+            device_,
+            swapchain_,
+            UINT64_MAX,
+            imageAvailableSemaphores_[currentFrame],
+            VK_NULL_HANDLE,
+            &currentImageIndex);
 
-    if (result == VK_ERROR_OUT_OF_DATE_KHR)
-    {
+    if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         recreateSwapchain();
         return;
-    }
-    else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
-    {
+    } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
         throw Exception("Failed to acquire swap chain image!");
     }
 
-    recordCommandBuffer(commandBuffers[currentImageIndex], currentImageIndex);
+    if (imagesInFlight_[currentImageIndex] != VK_NULL_HANDLE) {
+        vkWaitForFences(device_, 1, &imagesInFlight_[currentImageIndex], VK_TRUE, UINT64_MAX);
+    }
+
+    vkResetFences(device_, 1, &inFlightFences_[currentFrame]);
+
+    beginCommandBuffer(commandBuffers[currentImageIndex], currentImageIndex);
 }
 
 void VulkanGraphicAPI::endFrame() {
+    endCommandBuffer(commandBuffers[currentImageIndex]);
+
     VkSubmitInfo submitInfo{VK_STRUCTURE_TYPE_SUBMIT_INFO};
 
     VkSemaphore waitSemaphores[] = {imageAvailableSemaphores_[currentFrame]};
@@ -110,7 +112,6 @@ void VulkanGraphicAPI::endFrame() {
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
-
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &commandBuffers[currentImageIndex];
 
@@ -118,10 +119,11 @@ void VulkanGraphicAPI::endFrame() {
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-    if (vkQueueSubmit(graphicsQueue_, 1, &submitInfo, inFlightFences_[currentFrame]) != VK_SUCCESS)
-    {
+    if (vkQueueSubmit(graphicsQueue_, 1, &submitInfo, inFlightFences_[currentFrame]) != VK_SUCCESS) {
         throw Exception("Failed to submit draw command buffer!");
     }
+    
+    imagesInFlight_[currentImageIndex] = inFlightFences_[currentFrame];
 
     VkSwapchainKHR const* rawSwapchainPtr = std::addressof(swapchain_.ref());
 
@@ -133,13 +135,9 @@ void VulkanGraphicAPI::endFrame() {
     presentInfo.pImageIndices = &currentImageIndex;
 
     VkResult result = vkQueuePresentKHR(presentQueue_, &presentInfo);
-
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
-    {
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
         recreateSwapchain();
-    }
-    else if (result != VK_SUCCESS)
-    {
+    } else if (result != VK_SUCCESS) {
         throw Exception("Failed to present swap chain image!");
     }
 

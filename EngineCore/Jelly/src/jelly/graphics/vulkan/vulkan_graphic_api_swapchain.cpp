@@ -85,12 +85,12 @@ void VulkanGraphicAPI::recreateSwapchain()
     createRenderPass();
     createFramebuffers();
     createCommandBuffers();
-    //CreateSyncObjects();
+    createSyncObjects();
 }
 
 void VulkanGraphicAPI::cleanupSwapchain()
 {
-    // Destroy framebuffers (ainda não são RAII)
+    // TODO : Destroy framebuffers (no RAII yet)
     for (auto framebuffer : swapchainFramebuffers_) {
         if (framebuffer != VK_NULL_HANDLE) {
             vkDestroyFramebuffer(device_, framebuffer, nullptr);
@@ -98,7 +98,7 @@ void VulkanGraphicAPI::cleanupSwapchain()
     }
     swapchainFramebuffers_.clear();
 
-    // Destroy image views (ainda não são RAII)
+    // TODO : Destroy image views (no RAII yet)
     for (auto view : swapchainImageViews) {
         if (view != VK_NULL_HANDLE) {
             vkDestroyImageView(device_, view, nullptr);
@@ -106,7 +106,6 @@ void VulkanGraphicAPI::cleanupSwapchain()
     }
     swapchainImageViews.clear();
 
-    // Limpa recursos RAII (eles farão o trabalho automaticamente)
     swapchain_.reset();
     renderPass_.reset();
 }

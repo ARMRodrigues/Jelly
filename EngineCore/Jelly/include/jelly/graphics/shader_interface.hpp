@@ -1,9 +1,11 @@
 #pragma once
 
+#include "jelly/jelly_export.hpp"
+
 namespace jelly::graphics {
 
 /// @brief Abstract base class for GPU shader programs. Implemented per backend (OpenGL, Vulkan, etc.).
-class ShaderInterface {
+class JELLY_EXPORT ShaderInterface {
 public:
     virtual ~ShaderInterface() = default;
 

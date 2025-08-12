@@ -1,5 +1,7 @@
 #include "jelly/core/scene.hpp"
 
+#include <iostream>
+
 namespace jelly::core {
 
 Scene::Scene(std::string name)

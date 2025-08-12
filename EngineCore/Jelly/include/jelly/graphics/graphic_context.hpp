@@ -1,5 +1,6 @@
 #pragma once
 
+#include "jelly/jelly_export.hpp"
 #include "jelly/core/graphic_api_type.hpp"
 #include "jelly/graphics/graphic_api_interface.hpp"
 
@@ -9,7 +10,7 @@ namespace jelly::graphics {
 ///
 /// This singleton class stores the selected graphics API type and
 /// its corresponding interface implementation.
-class GraphicContext {
+class JELLY_EXPORT GraphicContext {
 public:
     /// @brief Access the singleton instance.
     /// @return A reference to the global GraphicContext instance.
