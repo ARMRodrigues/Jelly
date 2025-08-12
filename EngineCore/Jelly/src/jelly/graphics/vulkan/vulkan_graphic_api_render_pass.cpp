@@ -8,7 +8,7 @@ namespace jelly::graphics::vulkan {
 
 void VulkanGraphicAPI::createRenderPass() {
     VkAttachmentDescription colorAttachment{};
-    colorAttachment.format = swapchainImageFormat;
+    colorAttachment.format = swapchainImageFormat_;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;

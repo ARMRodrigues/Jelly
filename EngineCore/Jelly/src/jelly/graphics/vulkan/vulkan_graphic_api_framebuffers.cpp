@@ -7,11 +7,11 @@
 namespace jelly::graphics::vulkan {
 
 void VulkanGraphicAPI::createFramebuffers() {
-    swapchainFramebuffers_.resize(swapchainImageViews.size());
+    swapchainFramebuffers_.resize(swapchainImageViews_.size());
 
-    for (size_t i = 0; i < swapchainImageViews.size(); ++i) {
+    for (size_t i = 0; i < swapchainImageViews_.size(); ++i) {
         VkImageView attachments[] = {
-            swapchainImageViews[i]
+            swapchainImageViews_[i]
         };
 
         VkFramebufferCreateInfo framebufferInfo{};
@@ -19,8 +19,8 @@ void VulkanGraphicAPI::createFramebuffers() {
         framebufferInfo.renderPass = renderPass_;
         framebufferInfo.attachmentCount = 1;
         framebufferInfo.pAttachments = attachments;
-        framebufferInfo.width = swapchainExtent.width;
-        framebufferInfo.height = swapchainExtent.height;
+        framebufferInfo.width = swapchainExtent_.width;
+        framebufferInfo.height = swapchainExtent_.height;
         framebufferInfo.layers = 1;
 
         if (vkCreateFramebuffer(device_, &framebufferInfo, nullptr, &swapchainFramebuffers_[i]) != VK_SUCCESS) {

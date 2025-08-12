@@ -57,13 +57,13 @@ void VulkanGraphicAPI::createSwapchain() {
         VK_NULL_HANDLE
     );
 
-    swapchainImageFormat = surfaceFmt.format;
-    swapchainExtent = extent;
+    swapchainImageFormat_ = surfaceFmt.format;
+    swapchainExtent_ = extent;
 
     uint32_t count = 0;
     vkGetSwapchainImagesKHR(device_, swapchain_, &count, nullptr);
-    swapchainImages.resize(count);
-    vkGetSwapchainImagesKHR(device_, swapchain_, &count, swapchainImages.data());
+    swapchainImages_.resize(count);
+    vkGetSwapchainImagesKHR(device_, swapchain_, &count, swapchainImages_.data());
 }
 
 void VulkanGraphicAPI::recreateSwapchain()
@@ -99,12 +99,12 @@ void VulkanGraphicAPI::cleanupSwapchain()
     swapchainFramebuffers_.clear();
 
     // TODO : Destroy image views (no RAII yet)
-    for (auto view : swapchainImageViews) {
+    for (auto view : swapchainImageViews_) {
         if (view != VK_NULL_HANDLE) {
             vkDestroyImageView(device_, view, nullptr);
         }
     }
-    swapchainImageViews.clear();
+    swapchainImageViews_.clear();
 
     swapchain_.reset();
     renderPass_.reset();

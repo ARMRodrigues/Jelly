@@ -5,20 +5,20 @@
 namespace jelly::graphics::vulkan {
 
 void VulkanGraphicAPI::createCommandBuffers() {
-    if (!commandBuffers.empty()) {
-        vkFreeCommandBuffers(device_, commandPool_, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
-        commandBuffers.clear();
+    if (!commandBuffers_.empty()) {
+        vkFreeCommandBuffers(device_, commandPool_, static_cast<uint32_t>(commandBuffers_.size()), commandBuffers_.data());
+        commandBuffers_.clear();
     }
 
-    commandBuffers.resize(swapchainImages.size());
+    commandBuffers_.resize(swapchainImages_.size());
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.commandPool = commandPool_;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
+    allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers_.size());
 
-    if (vkAllocateCommandBuffers(device_, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(device_, &allocInfo, commandBuffers_.data()) != VK_SUCCESS) {
         throw Exception("Failed to allocate command buffers!");
     }
 }
@@ -34,7 +34,7 @@ void VulkanGraphicAPI::beginCommandBuffer(VkCommandBuffer commandBuffer, uint32_
     renderPassInfo.renderPass = renderPass_;
     renderPassInfo.framebuffer = swapchainFramebuffers_[imageIndex];
     renderPassInfo.renderArea.offset = {0, 0};
-    renderPassInfo.renderArea.extent = swapchainExtent;
+    renderPassInfo.renderArea.extent = swapchainExtent_;
 
     VkClearValue clearColor = {0.468f, 0.177f, 0.741f, 1.0f};
     renderPassInfo.clearValueCount = 1;

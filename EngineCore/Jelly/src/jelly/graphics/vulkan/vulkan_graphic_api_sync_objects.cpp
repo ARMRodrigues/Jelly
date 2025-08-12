@@ -19,10 +19,10 @@ void VulkanGraphicAPI::createSyncObjects() {
     renderFinishedSemaphores_.clear();
     imagesInFlight_.clear();
 
-    inFlightFences_.resize(MaxFramesInFlight, VK_NULL_HANDLE);
-    imageAvailableSemaphores_.resize(MaxFramesInFlight, VK_NULL_HANDLE);
-    renderFinishedSemaphores_.resize(MaxFramesInFlight, VK_NULL_HANDLE);
-    imagesInFlight_.resize(swapchainImages.size(), VK_NULL_HANDLE);
+    inFlightFences_.resize(maxFramesInFlight_, VK_NULL_HANDLE);
+    imageAvailableSemaphores_.resize(maxFramesInFlight_, VK_NULL_HANDLE);
+    renderFinishedSemaphores_.resize(maxFramesInFlight_, VK_NULL_HANDLE);
+    imagesInFlight_.resize(swapchainImages_.size(), VK_NULL_HANDLE);
 
     VkSemaphoreCreateInfo semInfo{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
     VkFenceCreateInfo fenceInfo{VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
