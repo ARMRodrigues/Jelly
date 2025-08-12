@@ -18,7 +18,7 @@ VulkanMaterial::VulkanMaterial(std::shared_ptr<ShaderInterface> shader)
 void VulkanMaterial::VulkanMaterial::bind() {
     auto api = static_cast<VulkanGraphicAPI*>(jelly::graphics::GraphicContext::get().getAPI());
     VkCommandBuffer cmd = api->getCurrentCommandBuffer();
-    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_);
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_.get());
 }
 
 void VulkanMaterial::VulkanMaterial::unbind() {
@@ -37,21 +37,39 @@ void VulkanMaterial::createPipeline(VulkanGraphicAPI* api) {
     }
 
     VkDevice device = api->getDevice();
+    VkRenderPass renderPass = api->getRenderPass();
+    VkExtent2D extent = api->getSwapchainExtent();
 
-    VkPipelineLayoutCreateInfo layoutInfo{VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
+    // Create pipeline layout (example, customize as needed)
+    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutInfo.setLayoutCount = 0;
+    pipelineLayoutInfo.pushConstantRangeCount = 0;
 
-    if (vkCreatePipelineLayout(device, &layoutInfo, nullptr, &pipelineLayout_) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create pipeline layout");
+    VkPipelineLayout rawPipelineLayout = VK_NULL_HANDLE;
+    if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &rawPipelineLayout) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create pipeline layout");
     }
 
-    // Criação do pipeline gráfico
-    pipeline_ = createGraphicsPipeline(
+    pipelineLayout_ = jelly::core::ManagedResource<VkPipelineLayout>(
+        rawPipelineLayout,
+        [device](VkPipelineLayout layout) { vkDestroyPipelineLayout(device, layout, nullptr); },
+        VK_NULL_HANDLE
+    );
+
+    // Create graphics pipeline (you must get shader modules from shader_)
+    VkPipeline rawPipeline = createGraphicsPipeline(
         device,
-        api->getRenderPass(),
-        pipelineLayout_,
+        renderPass,
+        pipelineLayout_.get(),
         vkShader->getVertexModule()->getModule(),
         vkShader->getFragmentModule()->getModule(),
-        api->getSwapchainExtent()
+        extent);
+
+    pipeline_ = jelly::core::ManagedResource<VkPipeline>(
+        rawPipeline,
+        [device](VkPipeline pipeline) { vkDestroyPipeline(device, pipeline, nullptr); },
+        VK_NULL_HANDLE
     );
 }
 
