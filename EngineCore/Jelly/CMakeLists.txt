@@ -24,6 +24,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(entt)
 
+# glm
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+    GIT_TAG        1.0.1
+)
+FetchContent_MakeAvailable(glm)
+
 # Source/header directories
 
 set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/jelly)
@@ -41,6 +49,11 @@ set(HEADERS
     ${HEADER_DIR}/core/game_system_interface.hpp
     ${HEADER_DIR}/core/scene.hpp
     ${HEADER_DIR}/core/scene_manager.hpp
+    ${HEADER_DIR}/core/transform.hpp
+    ${HEADER_DIR}/core/hierarchy.hpp
+    ${HEADER_DIR}/core/camera.hpp
+    ${HEADER_DIR}/core/transform_system.hpp
+    ${HEADER_DIR}/core/camera_system.hpp
     ${HEADER_DIR}/graphics/graphic_api_interface.hpp
     ${HEADER_DIR}/graphics/graphic_api_factory.hpp
     ${HEADER_DIR}/graphics/graphic_context.hpp
@@ -73,6 +86,8 @@ set(SRC_FILES
     ${SRC_DIR}/core/logger.cpp
     ${SRC_DIR}/core/scene.cpp
     ${SRC_DIR}/core/scene_manager.cpp
+    ${SRC_DIR}/core/transform_system.cpp
+    ${SRC_DIR}/core/camera_system.cpp
     ${SRC_DIR}/graphics/graphic_context.cpp
     ${SRC_DIR}/graphics/shader_factory.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api.cpp
@@ -119,6 +134,7 @@ target_compile_definitions(Jelly PRIVATE JELLY_BUILD_DLL)
 # Include directories
 target_include_directories(Jelly PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${glm_SOURCE_DIR}
 )
 
 # Linked libraries
