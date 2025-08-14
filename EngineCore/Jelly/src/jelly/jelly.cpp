@@ -58,6 +58,10 @@ void Jelly::pollEvents() {
     }
 }
 
+void Jelly::update() {
+    sceneManager_->updateActiveScene();
+}
+
 void Jelly::render() {
     if (!isHeadless_ && windowSystem_) {
         graphicAPI_->beginFrame();

@@ -1,12 +1,14 @@
 #pragma once
 
+#include "jelly/jelly_export.hpp"
+
 namespace jelly::core {
 
 /// @brief Interface for game systems used within a Scene.
 /// 
 /// Game systems implement behavior such as logic updates, rendering,
 /// and physics. This interface defines the common lifecycle methods.
-class GameSystemInterface {
+class JELLY_EXPORT GameSystemInterface {
 public:
     /// @brief Virtual destructor.
     virtual ~GameSystemInterface() = default;

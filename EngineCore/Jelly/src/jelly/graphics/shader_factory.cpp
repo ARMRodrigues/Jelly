@@ -4,8 +4,6 @@
 #include "jelly/graphics/vulkan/vulkan_shader.hpp"
 #include "jelly/graphics/vulkan/vulkan_graphic_api.hpp"
 
-#include <iostream>
-
 namespace jelly::graphics {
 
 std::shared_ptr<ShaderInterface> ShaderFactory::createFromFiles(const std::string& shaderPath) {
@@ -29,7 +27,7 @@ std::shared_ptr<ShaderInterface> ShaderFactory::createFromFiles(const std::strin
         if (!vertex) throw std::runtime_error("Vertex shader unique_ptr is null");
         if (!fragment) throw std::runtime_error("Fragment shader unique_ptr is null");
 
-        return std::make_shared<vulkan::VulkanShader>(std::move(vertex), std::move(fragment));
+        return std::make_shared<vulkan::VulkanShader>(vkApi, std::move(vertex), std::move(fragment));
     }
     
     

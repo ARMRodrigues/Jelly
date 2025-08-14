@@ -6,6 +6,11 @@
 #include "jelly/graphics/mesh_factory.hpp"
 #include "jelly/graphics/mesh_renderer_system.hpp"
 #include "jelly/graphics/material_factory.hpp"
+#include "jelly/core/transform.hpp"
+#include "jelly/core/hierarchy.hpp"
+#include "jelly/core/transform_system.hpp"
+#include "jelly/core/camera.hpp"
+#include "jelly/core/camera_system.hpp"
 
 struct Vertex {
     float position[3];
@@ -27,7 +32,30 @@ int main() {
     // TODO : remove to another project later
     auto scene = std::make_unique<jelly::core::Scene>("MyScene");
 
+    auto& registry = scene->getEntityManager();
+
+    // Transform system
+    auto transformSystem = std::make_shared<jelly::core::TransformSystem>(scene->getEntityManager());
+    scene->addGameSystem(transformSystem);
+
+    // Creating camera
+    auto cameraEntity = scene->getEntityManager().create();
+    auto& cameraTransform = registry.emplace<jelly::core::Transform>(cameraEntity);
+    cameraTransform.setLocalPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+
+    jelly::core::Camera cam;
+    cam.type = jelly::core::CameraType::Perspective;
+    cam.fieldOfViewDegrees = 60.0f;
+    cam.nearPlane = 0.03f;
+    cam.farPlane = 1000.0f;
+    registry.emplace<jelly::core::Camera>(cameraEntity, cam);
+
+    auto cameraSystem = std::make_shared<jelly::core::CameraSystem>(registry, (float)1280, (float)720);
+    scene->addGameSystem(cameraSystem);
+
+    // Mesh Entity
     auto entity = scene->getEntityManager().create();
+    registry.emplace<jelly::core::Transform>(entity);
 
     auto shader = jelly::graphics::ShaderFactory::createFromFiles("triangle");
 
@@ -44,7 +72,6 @@ int main() {
     auto mesh = jelly::graphics::MeshFactory::create();
     mesh->upload(triangleVertices, sizeof(triangleVertices), triangleIndices, sizeof(triangleIndices));
 
-    auto& registry = scene->getEntityManager();
     registry.emplace<jelly::graphics::MeshComponent>(entity, mesh);
     registry.emplace<jelly::graphics::MaterialComponent>(entity, material);
 
@@ -57,6 +84,7 @@ int main() {
     while (jelly.isRunning())
     {
         jelly.pollEvents();
+        jelly.update();
         jelly.render();
     }
 
