@@ -17,9 +17,7 @@ using core::SceneManager;
 using graphics::GraphicAPIInterface;
 using windowing::WindowSystemInterface;
 
-/**
- * @brief Core engine class responsible for initializing the window and graphics system.
- */
+/// @brief Core engine class responsible for initializing the window and graphics system.
 class JELLY_EXPORT Jelly {
 public:
     Jelly() = default;
@@ -31,38 +29,31 @@ public:
     Jelly(Jelly&&) = delete;
     Jelly& operator=(Jelly&&) = delete; 
 
-    /**
-    * @brief Initializes the engine with the selected graphics API and window settings.
-    * 
-    * @param graphicsAPIType The graphics API to use (e.g., Vulkan).
-    * @param windowSettings Window configuration options.
-    * @return True if initialization succeeded.
-    */
+    
+    /// @brief Initializes the engine with the selected graphics API and window settings.
+    ///
+    /// @param graphicsAPIType The graphics API to use (e.g., Vulkan).
+    /// @param windowSettings Window configuration options.
+    /// @return True if initialization succeeded.
     bool initialize(GraphicAPIType graphicAPIType, const WindowSettings& windowSettings);
 
-    /**
-    * @brief Returns true if the engine is running in headless mode (no graphics or window).
-    */
+    ///
+    /// @brief Returns true if the engine is running in headless mode (no graphics or window).
     bool isHeadless() const;
 
-    /**
-    * @brief Returns true if the engine should keep running (i.e., window is still open).
-    */
+    /// @brief Returns true if the engine should keep running (i.e., window is still open).
     bool isRunning() const;
 
-    /**
-    * @brief Polls input and window events (e.g., keyboard, resize, close).
-    */
+    /// @brief Polls input and window events (e.g., keyboard, resize, close).
     void pollEvents();
 
-    /**
-    * @brief Renders a single frame (calls beginFrame/endFrame internally).
-    */
+    /// @brief Updates all engine systems (scene, physics, etc.) for the current frame.
+    void update();
+
+    /// @brief Renders a single frame (calls beginFrame/endFrame internally).
     void render();
 
-    /**
-    * @brief Shuts down the engine and releases all resources
-    */
+    /// @brief Shuts down the engine and releases all resources
     void shutdown();
 
     // Getters

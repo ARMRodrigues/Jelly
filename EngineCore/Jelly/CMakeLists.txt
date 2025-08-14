@@ -90,6 +90,7 @@ set(SRC_FILES
     ${SRC_DIR}/core/camera_system.cpp
     ${SRC_DIR}/graphics/graphic_context.cpp
     ${SRC_DIR}/graphics/shader_factory.cpp
+    ${SRC_DIR}/graphics/mesh_renderer_system.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_instance.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_surface.cpp
@@ -104,6 +105,7 @@ set(SRC_FILES
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_sync_objects.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_helpers.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_shader_module.cpp
+    ${SRC_DIR}/graphics/vulkan/vulkan_shader.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_mesh.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_material.cpp
     ${SRC_DIR}/windowing/glfw/glfw_window_system.cpp

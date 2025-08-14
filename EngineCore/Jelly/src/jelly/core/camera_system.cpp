@@ -37,15 +37,6 @@ void CameraSystem::update()
             float left  = -camera.orthographicSize * camera.aspect;
             camera.projection = glm::orthoRH_ZO(left, right, bottom, top, camera.nearPlane, camera.farPlane);
         }
-
-        // VULKAN Y flip
-        static const glm::mat4 vulkanClipFix(
-            1,  0, 0, 0,
-            0, -1, 0, 0,
-            0,  0, 1, 0,
-            0,  0, 0, 1
-        );
-        camera.projection = vulkanClipFix * camera.projection;
     });
 }
 

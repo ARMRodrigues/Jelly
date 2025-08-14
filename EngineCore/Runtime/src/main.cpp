@@ -40,7 +40,8 @@ int main() {
 
     // Creating camera
     auto cameraEntity = scene->getEntityManager().create();
-    registry.emplace<jelly::core::Transform>(cameraEntity);
+    auto& cameraTransform = registry.emplace<jelly::core::Transform>(cameraEntity);
+    cameraTransform.setLocalPosition(glm::vec3(0.0f, 0.0f, 10.0f));
 
     jelly::core::Camera cam;
     cam.type = jelly::core::CameraType::Perspective;
@@ -54,6 +55,7 @@ int main() {
 
     // Mesh Entity
     auto entity = scene->getEntityManager().create();
+    registry.emplace<jelly::core::Transform>(entity);
 
     auto shader = jelly::graphics::ShaderFactory::createFromFiles("triangle");
 
@@ -82,6 +84,7 @@ int main() {
     while (jelly.isRunning())
     {
         jelly.pollEvents();
+        jelly.update();
         jelly.render();
     }
 

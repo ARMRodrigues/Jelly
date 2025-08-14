@@ -8,38 +8,31 @@ TransformSystem::TransformSystem(entt::registry& registry)
 }
 
 void TransformSystem::update() {
-        // 1. Entidades sem pai → worldMatrix = localMatrix
-        auto noParentView = registry_.view<Transform>(entt::exclude<Hierarchy>);
-        for (auto e : noParentView) {
-            auto& t = noParentView.get<Transform>(e);
-            if (t.hasTransformValuesChanged) {
-                t.rebuildLocalMatrix();
-                t.hasTransformValuesChanged = false;
-            }
-            t.worldMatrix = t.localMatrix;
+    auto view = registry_.view<Transform>();
+    for (auto e : view) {
+        auto& t = view.get<Transform>(e);
+        if (t.hasTransformValuesChanged) {
+            t.rebuildLocalMatrix();
+            t.hasTransformValuesChanged = false;
         }
-
-        // 2. Entidades com pai → herda matriz do pai
-        auto parentView = registry_.view<Transform, Hierarchy>();
-        parentView.each([&](auto entity, Transform &t, Hierarchy &h) {
-            if (t.hasTransformValuesChanged) {
-                t.rebuildLocalMatrix();
-                t.hasTransformValuesChanged = false;
-            }
-
-            for (auto child : h.children) {
-                if (auto* childTransform = registry_.try_get<Transform>(child)) {
-                    if (childTransform->hasTransformValuesChanged) {
-                        childTransform->rebuildLocalMatrix();
-                        childTransform->hasTransformValuesChanged = false;
-                    }
-                    childTransform->worldMatrix = h.parent != entt::null
-                        ? childTransform->localMatrix * t.worldMatrix
-                        : childTransform->localMatrix;
-                }
-            }
-        });
     }
+    
+    auto rootView = registry_.view<Transform>(entt::exclude<Hierarchy>);
+    for (auto e : rootView) {
+        propagateWorldMatrix(e, glm::mat4(1.0f));
+    }
+}
+
+void TransformSystem::propagateWorldMatrix(entt::entity entity, const glm::mat4& parentWorld) {
+    auto& t = registry_.get<Transform>(entity);
+    t.worldMatrix = parentWorld * t.localMatrix;
+
+    if (auto* h = registry_.try_get<Hierarchy>(entity)) {
+        for (auto child : h->children) {
+            propagateWorldMatrix(child, t.worldMatrix);
+        }
+    }
+}
 
 
 } // namespace jelly::core

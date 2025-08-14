@@ -1,8 +1,8 @@
 #include "jelly/graphics/vulkan/vulkan_material.hpp"
 #include "jelly/graphics/vulkan/vulkan_shader.hpp"
 #include "jelly/graphics/graphic_context.hpp"
-#include <stdexcept>
 
+#include <stdexcept>
 #include <iostream>
 
 namespace jelly::graphics::vulkan {
@@ -17,12 +17,29 @@ VulkanMaterial::VulkanMaterial(std::shared_ptr<ShaderInterface> shader)
 
 void VulkanMaterial::VulkanMaterial::bind() {
     auto api = static_cast<VulkanGraphicAPI*>(jelly::graphics::GraphicContext::get().getAPI());
+    auto vkShader = static_cast<jelly::graphics::vulkan::VulkanShader*>(shader_.get());
+
     VkCommandBuffer cmd = api->getCurrentCommandBuffer();
+    VkDescriptorSet descriptorSet = vkShader->getDescriptorSet();
+
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_.get());
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout_.get(), 0, 1, &descriptorSet, 0, nullptr);
 }
 
 void VulkanMaterial::VulkanMaterial::unbind() {
     // No-op (Vulkan não precisa de unbind explícito)
+}
+
+void VulkanMaterial::setVec3(const char* name, const float* vec) {
+    auto vulkanShader = std::dynamic_pointer_cast<VulkanShader>(getShader());
+    if (vulkanShader)
+        vulkanShader->setUniformVec3(name, vec);
+}
+
+void VulkanMaterial::setMat4(const char* name, const float* matrix) {
+    auto vulkanShader = std::dynamic_pointer_cast<VulkanShader>(getShader());
+    if (vulkanShader)
+        vulkanShader->setUniformMat4(name, matrix);
 }
 
 void VulkanMaterial::createPipeline(VulkanGraphicAPI* api) {
@@ -40,10 +57,13 @@ void VulkanMaterial::createPipeline(VulkanGraphicAPI* api) {
     VkRenderPass renderPass = api->getRenderPass();
     VkExtent2D extent = api->getSwapchainExtent();
 
+    VkDescriptorSetLayout setLayout = vkShader->getDescriptorSetLayout();
+
     // Create pipeline layout (example, customize as needed)
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 0;
+    pipelineLayoutInfo.setLayoutCount = 1; // temos 1 set layout
+    pipelineLayoutInfo.pSetLayouts = &setLayout;
     pipelineLayoutInfo.pushConstantRangeCount = 0;
 
     VkPipelineLayout rawPipelineLayout = VK_NULL_HANDLE;
@@ -97,13 +117,13 @@ VkPipeline VulkanMaterial::createGraphicsPipeline(
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
     VkVertexInputBindingDescription bindingDescription{};
     bindingDescription.binding = 0;
-    bindingDescription.stride = sizeof(Vertex); // seu struct Vertex
+    bindingDescription.stride = sizeof(Vertex);
     bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
     VkVertexInputAttributeDescription attributeDescription{};
     attributeDescription.binding = 0;
     attributeDescription.location = 0;
-    attributeDescription.format = VK_FORMAT_R32G32B32_SFLOAT; // assume que só tem posição vec3
+    attributeDescription.format = VK_FORMAT_R32G32B32_SFLOAT;
     attributeDescription.offset = offsetof(Vertex, position);
 
     vertexInputInfo.vertexBindingDescriptionCount = 1;
@@ -115,12 +135,11 @@ VkPipeline VulkanMaterial::createGraphicsPipeline(
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 
     // Viewport e scissor
-    //VkViewport viewport{0.0f, 0.0f, static_cast<float>(extent.width), static_cast<float>(extent.height), 0.0f, 1.0f};
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = static_cast<float>(extent.height);
     viewport.width = static_cast<float>(extent.width);
-    viewport.height = -static_cast<float>(extent.height); // negativo!
+    viewport.height = -static_cast<float>(extent.height);
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
     VkRect2D scissor{{0, 0}, extent};
