@@ -1,0 +1,14 @@
+{
+    "project_name": "MyGameProject",
+    "assets_dir": "../EngineCore/Runtime/src/Assets/",
+    "output_dir": "../Output/Debug/Assets/",
+    "texture_settings": {
+        "format": "BC7", 
+        "generate_mipmaps": true,
+        "max_resolution": 2048
+    },
+    "meta_settings": {
+        "store_hash": true,
+        "store_last_modified": true
+    }
+}
