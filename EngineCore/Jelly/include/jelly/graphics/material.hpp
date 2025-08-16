@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shader_interface.hpp"
+#include "texture_interface.hpp"
 
 #include "jelly/jelly_export.hpp"
 
@@ -21,6 +22,8 @@ public:
 
     /// @brief Binds the material for rendering (activates shader and resources).
     virtual void bind() = 0;
+
+    virtual void setTexture(unsigned slot, std::shared_ptr<TextureInterface> texture) = 0;
 
     /// @brief Unbinds the material (if required by the graphics API).
     virtual void unbind() = 0;
