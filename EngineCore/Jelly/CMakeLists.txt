@@ -115,6 +115,11 @@ set(SRC_FILES
 # Library target
 add_library(Jelly SHARED ${SRC_FILES} ${HEADERS})
 
+# Compile Definitions
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(JELLY_DEBUG)
+endif()
+
 # Windows: remove 'lib' prefix when using MinGW
 if(WIN32 AND MINGW)
     set_target_properties(Jelly PROPERTIES

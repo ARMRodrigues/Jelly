@@ -79,7 +79,7 @@ void Logger::Log(LogLevel level, const std::string& message) {
         case LogLevel::Highlight:   std::cout << "[INFO] "; break;
         case LogLevel::Warning:     std::cout << "[WARN] "; break;
         case LogLevel::Error:       std::cout << "[ERROR] "; break;
-        default:                    std::cout << "[LOG] "; break;
+        default:                    std::cout << "[DEBUG] "; break;
     }
 
     std::cout << message << std::endl;
@@ -102,7 +102,7 @@ void Logger::Log(LogLevel level, const std::string& message) {
         case LogLevel::Highlight:   levelStr = "[INFO] "; break;
         case LogLevel::Warning:     levelStr = "[WARN] "; break;
         case LogLevel::Error:       levelStr = "[ERROR] "; break;
-        default:                    levelStr = "[LOG] "; break;
+        default:                    levelStr = "[DEBUG] "; break;
     }
 
     std::cout << colorCode << "[" << timeStr << "] " << levelStr << message << "\033[0m" << std::endl;
