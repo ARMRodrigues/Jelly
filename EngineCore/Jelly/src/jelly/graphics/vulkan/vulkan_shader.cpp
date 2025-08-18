@@ -196,6 +196,22 @@ void VulkanShader::unbind() {
     // Vulkan does not need explicit unbind
 }
 
+void VulkanShader::release()
+{
+    if (api_ && api_->getDevice() != VK_NULL_HANDLE) { 
+        fragment_.reset(); 
+        vertex_.reset(); 
+        
+        // ManagedResource vai chamar vkDestroyBuffer, vkFreeMemory, vkDestroyDescriptorSetLayout, vkDestroyDescriptorPool 
+        uniformBuffer_.reset(); 
+        uniformBufferMemory_.reset(); 
+        descriptorSetLayout_.reset(); 
+        descriptorPool_.reset(); // descriptorSet_ não precisa destruir explicitamente, é liberado junto com o pool 
+        
+        descriptorSet_ = VK_NULL_HANDLE;
+    }
+}
+
 void VulkanShader::setUniformVec3(const char* name, const float* vec) {
     // TODO: implement uniform setting (push constants or descriptor sets)
 }

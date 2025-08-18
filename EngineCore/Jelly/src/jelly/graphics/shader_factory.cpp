@@ -6,6 +6,9 @@
 
 namespace jelly::graphics {
 
+std::vector<std::weak_ptr<ShaderInterface>> ShaderFactory::shaders_;
+std::mutex ShaderFactory::mutex_;
+
 std::shared_ptr<ShaderInterface> ShaderFactory::createFromFiles(const std::string& shaderPath) {
 
     auto& context = GraphicContext::get();
@@ -27,11 +30,33 @@ std::shared_ptr<ShaderInterface> ShaderFactory::createFromFiles(const std::strin
         if (!vertex) throw std::runtime_error("Vertex shader unique_ptr is null");
         if (!fragment) throw std::runtime_error("Fragment shader unique_ptr is null");
 
-        return std::make_shared<vulkan::VulkanShader>(vkApi, std::move(vertex), std::move(fragment));
+        auto shader = std::make_shared<vulkan::VulkanShader>(vkApi, std::move(vertex), std::move(fragment));
+        registerShader(shader);
+
+        return shader;
     }
     
     
     return nullptr;
+}
+
+
+void ShaderFactory::releaseAll()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    for (auto& weakShader : shaders_) {
+        if (auto shader = weakShader.lock()) {
+            shader->release(); 
+        }
+    }
+    
+    shaders_.clear();
+}
+
+void ShaderFactory::registerShader(const std::shared_ptr<ShaderInterface> &shader) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    shaders_.push_back(shader);
 }
 
 std::filesystem::path ShaderFactory::resolveShaderPath(

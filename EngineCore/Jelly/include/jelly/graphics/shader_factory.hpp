@@ -1,7 +1,8 @@
 #pragma once
 
+#include "shader_interface.hpp"
+
 #include "jelly/jelly_export.hpp"
-#include "jelly/graphics/shader_interface.hpp"
 #include "jelly/core/graphic_api_type.hpp"
 
 #include <memory>
@@ -10,6 +11,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <filesystem>
+#include <mutex>
 
 namespace jelly::graphics {
 
@@ -28,7 +30,17 @@ public:
     /// @return A shared pointer to a ShaderInterface implementation.
     static std::shared_ptr<ShaderInterface> createFromFiles(const std::string& vertexPath);
 
+    /// @brief Releases all cached shader resources
+    static void releaseAll();
+
 private:
+    static std::vector<std::weak_ptr<ShaderInterface>> shaders_; 
+    static std::mutex mutex_;
+
+    /// @brief Registers a shader instance in the factory's tracking system
+    /// @param shader Shared pointer to the shader to register
+    static void registerShader(const std::shared_ptr<ShaderInterface>& shader);
+
     /// @brief Resolves the complete shader file path based on name, stage, and backend.
     ///
     /// For example, calling with ("basic", "frag", "vulkan") might return "shaders/basic.frag.vulkan.spv".

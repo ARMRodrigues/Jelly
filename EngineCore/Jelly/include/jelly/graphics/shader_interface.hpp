@@ -15,6 +15,10 @@ public:
     /// @brief Unbind the shader (optional).
     virtual void unbind() = 0;
 
+    /// @brief Releases all GPU resources associated with this shader
+    /// @note Must be called before destruction if the shader needs explicit cleanup
+    virtual void release() = 0;
+
     /// @brief Sets a 3-component vector uniform
     /// @param name Uniform variable name in shader
     /// @param vec Pointer to 3 consecutive float values

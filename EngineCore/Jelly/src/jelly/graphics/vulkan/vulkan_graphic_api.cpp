@@ -2,6 +2,7 @@
 
 #include "jelly/error.hpp"
 #include "jelly/exception.hpp"
+#include "jelly/graphics/shader_factory.hpp"
 
 namespace jelly::graphics::vulkan {
 
@@ -148,6 +149,8 @@ void VulkanGraphicAPI::shutdown() {
     if (device_ != VK_NULL_HANDLE) {
         vkDeviceWaitIdle(device_);
     }
+
+    jelly::graphics::ShaderFactory::releaseAll();
 
     imageAvailableSemaphores_.clear();
     renderFinishedSemaphores_.clear();
