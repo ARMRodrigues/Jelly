@@ -1,11 +1,15 @@
 #pragma once
 
 #include "vulkan_graphic_api.hpp"
+#include "vulkan_texture.hpp"
 
 #include "jelly/jelly_export.hpp"
+
 #include "jelly/core/managed_resource.hpp"
+
 #include "jelly/graphics/material.hpp"
 #include "jelly/graphics/shader_interface.hpp"
+#include "jelly/graphics/texture_interface.hpp"
 
 #include <vulkan/vulkan.h>
 
@@ -24,7 +28,11 @@ public:
     void createPipeline(VulkanGraphicAPI* api);
 
     /// @brief Binds the material's pipeline for rendering
-    void bind() override;
+    void bind() override;    
+
+    /// @brief Sets the albedo (base color) texture
+    /// @param texture The texture to use as albedo map
+    void setAlbedoTexture(std::shared_ptr<TextureInterface> texture) override;
     
     /// @brief Unbinds the material (Vulkan typically doesn't require this)
     void unbind() override;
@@ -41,6 +49,7 @@ public:
 
 private:
     std::shared_ptr<jelly::graphics::ShaderInterface> shader_;
+    std::unordered_map<TextureType, std::shared_ptr<VulkanTexture>> textures_;
 
     // Auto-managed Vulkan resources
     jelly::core::ManagedResource<VkPipeline> pipeline_;

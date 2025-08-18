@@ -62,6 +62,14 @@ public:
     /// @brief Gets the extent (resolution) of the swapchain.
     VkExtent2D getSwapchainExtent() const { return swapchainExtent_; }
 
+    VkCommandPool getCommandPool() const {
+        return commandPool_; // command pool criado com VK_COMMAND_POOL_CREATE_TRANSIENT_BIT
+    }
+
+    VkQueue getGraphicsQueue() const {
+        return graphicsQueue_;
+    }
+
 private:
     // === Window system ===
     jelly::windowing::VulkanNativeWindowHandleProvider* windowProvider_ = nullptr;

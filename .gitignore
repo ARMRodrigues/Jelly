@@ -12,6 +12,7 @@ Thumbs.db
 *.suo
 
 # Build
+__pycache__/
 bin/
 obj/
 Build/

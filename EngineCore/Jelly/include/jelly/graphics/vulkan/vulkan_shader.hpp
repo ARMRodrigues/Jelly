@@ -4,7 +4,9 @@
 #include "vulkan_shader_module.hpp"
 
 #include "jelly/jelly_export.hpp"
+
 #include "jelly/core/managed_resource.hpp"
+
 #include "jelly/graphics/shader_interface.hpp"
 
 #include <vulkan/vulkan.h>

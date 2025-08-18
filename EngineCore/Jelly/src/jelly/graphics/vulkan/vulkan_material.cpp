@@ -5,25 +5,48 @@
 #include <stdexcept>
 #include <iostream>
 
+#include <glm/glm.hpp>
+
 namespace jelly::graphics::vulkan {
 
 struct Vertex {
     float position[3];
+    glm::vec2 uv;
 };
 
 VulkanMaterial::VulkanMaterial(std::shared_ptr<ShaderInterface> shader)
     : MaterialInterface(shader), shader_(shader)
 {}
 
-void VulkanMaterial::VulkanMaterial::bind() {
+uint32_t getBindingForTextureType(TextureType type) {
+    switch (type) {
+        case TextureType::Albedo:   return 1;
+        case TextureType::Normal:   return 2;
+        //case TextureType::Roughness:return 2;
+        // Add more later
+        default: return 1;
+    }
+}
+
+void VulkanMaterial::bind() {
     auto api = static_cast<VulkanGraphicAPI*>(jelly::graphics::GraphicContext::get().getAPI());
     auto vkShader = static_cast<jelly::graphics::vulkan::VulkanShader*>(shader_.get());
 
     VkCommandBuffer cmd = api->getCurrentCommandBuffer();
     VkDescriptorSet descriptorSet = vkShader->getDescriptorSet();
 
+    for (auto& [type, texture] : textures_) {
+        uint32_t binding = getBindingForTextureType(type);
+        texture->bind(descriptorSet, binding);
+    }
+
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_.get());
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout_.get(), 0, 1, &descriptorSet, 0, nullptr);
+}
+
+void VulkanMaterial::setAlbedoTexture(std::shared_ptr<TextureInterface> texture)
+{
+    textures_[TextureType::Albedo] = std::static_pointer_cast<VulkanTexture>(texture);
 }
 
 void VulkanMaterial::VulkanMaterial::unbind() {
@@ -114,22 +137,31 @@ VkPipeline VulkanMaterial::createGraphicsPipeline(
     VkPipelineShaderStageCreateInfo shaderStages[] = { vertStageInfo, fragStageInfo };
 
     // Vertex input
-    VkPipelineVertexInputStateCreateInfo vertexInputInfo{VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
     VkVertexInputBindingDescription bindingDescription{};
     bindingDescription.binding = 0;
     bindingDescription.stride = sizeof(Vertex);
     bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    VkVertexInputAttributeDescription attributeDescription{};
-    attributeDescription.binding = 0;
-    attributeDescription.location = 0;
-    attributeDescription.format = VK_FORMAT_R32G32B32_SFLOAT;
-    attributeDescription.offset = offsetof(Vertex, position);
+    VkVertexInputAttributeDescription attributeDescriptions[2]{};
 
+    // Position
+    attributeDescriptions[0].binding = 0;
+    attributeDescriptions[0].location = 0;
+    attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[0].offset = offsetof(Vertex, position);
+
+    // UV
+    attributeDescriptions[1].binding = 0;
+    attributeDescriptions[1].location = 1;
+    attributeDescriptions[1].format = VK_FORMAT_R32G32_SFLOAT;
+    attributeDescriptions[1].offset = offsetof(Vertex, uv);
+
+    VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertexInputInfo.vertexBindingDescriptionCount = 1;
     vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-    vertexInputInfo.vertexAttributeDescriptionCount = 1;
-    vertexInputInfo.pVertexAttributeDescriptions = &attributeDescription;
+    vertexInputInfo.vertexAttributeDescriptionCount = 2;
+    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions;
 
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO};
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;

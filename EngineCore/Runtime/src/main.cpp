@@ -12,8 +12,15 @@
 #include "jelly/core/camera.hpp"
 #include "jelly/core/camera_system.hpp"
 
+#include "glm/glm.hpp"
+
+#include "jelly/graphics/image.hpp"
+#include "jelly/graphics/texture_factory.hpp"
+#include "jelly/graphics/material.hpp"
+
 struct Vertex {
     float position[3];
+    glm::vec2 uv;
 };
 
 int main() {
@@ -41,7 +48,7 @@ int main() {
     // Creating camera
     auto cameraEntity = scene->getEntityManager().create();
     auto& cameraTransform = registry.emplace<jelly::core::Transform>(cameraEntity);
-    cameraTransform.setLocalPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+    cameraTransform.setLocalPosition(glm::vec3(0.0f, 0.0f, 3.0f));
 
     jelly::core::Camera cam;
     cam.type = jelly::core::CameraType::Perspective;
@@ -59,18 +66,42 @@ int main() {
 
     auto shader = jelly::graphics::ShaderFactory::createFromFiles("triangle");
 
-    auto material = jelly::graphics::MaterialFactory::create(shader);
+    
 
-    Vertex triangleVertices[] = {
-    {{ 0.0f,  0.5f, 0.0f }},
-    {{ 0.5f, -0.5f, 0.0f }},
-    {{-0.5f, -0.5f, 0.0f }},
+    /*Vertex triangleVertices[] = {
+        {{ 0.0f,  0.5f, 0.0f }},
+        {{ 0.5f, -0.5f, 0.0f }},
+        {{-0.5f, -0.5f, 0.0f }},
     };
 
     uint32_t triangleIndices[] = { 0, 1, 2 };
 
     auto mesh = jelly::graphics::MeshFactory::create();
-    mesh->upload(triangleVertices, sizeof(triangleVertices), triangleIndices, sizeof(triangleIndices));
+    mesh->upload(triangleVertices, sizeof(triangleVertices), triangleIndices, sizeof(triangleIndices));*/
+
+    Vertex quadVertices[] = {
+        {{-0.5f,  0.5f, 0.0f}, {0.0f, 1.0f}}, // Top-left
+        {{ 0.5f,  0.5f, 0.0f}, {1.0f, 1.0f}}, // Top-right
+        {{ 0.5f, -0.5f, 0.0f}, {1.0f, 0.0f}}, // Bottom-right
+        {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}}, // Bottom-left
+    };
+
+    // Dois triângulos para formar o quad
+    uint32_t quadIndices[] = {
+        0, 1, 2, // Primeiro triângulo
+        2, 3, 0  // Segundo triângulo
+    };
+
+    auto image = jelly::graphics::Image("assets/test.data");
+    auto texture = jelly::graphics::TextureFactory::create(image);
+
+    auto material = jelly::graphics::MaterialFactory::create(shader);
+
+    //auto material = std::make_shared<jelly::graphics::MaterialInterface>();
+    material->setAlbedoTexture(texture);
+
+    auto mesh = jelly::graphics::MeshFactory::create();
+    mesh->upload(quadVertices, sizeof(quadVertices), quadIndices, sizeof(quadIndices));
 
     registry.emplace<jelly::graphics::MeshComponent>(entity, mesh);
     registry.emplace<jelly::graphics::MaterialComponent>(entity, material);
