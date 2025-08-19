@@ -83,7 +83,7 @@ void VulkanGraphicAPI::initialize() {
 
 void VulkanGraphicAPI::beginFrame() {
     vkWaitForFences(device_, 1, &inFlightFences_[currentFrame_], VK_TRUE, UINT64_MAX);
-    
+
     VkResult result = vkAcquireNextImageKHR(
             device_,
             swapchain_,
@@ -160,6 +160,16 @@ void VulkanGraphicAPI::shutdown() {
     jelly::graphics::MaterialFactory::releaseAll();
     jelly::graphics::TextureFactory::releaseAll();
 
+    // Destrói semáforos e fences
+    for (VkSemaphore sem : imageAvailableSemaphores_)
+        if (sem) vkDestroySemaphore(device_, sem, nullptr);
+
+    for (VkSemaphore sem : renderFinishedSemaphores_)
+        if (sem) vkDestroySemaphore(device_, sem, nullptr);
+
+    for (VkFence f : inFlightFences_)
+        if (f) vkDestroyFence(device_, f, nullptr);
+
     imageAvailableSemaphores_.clear();
     renderFinishedSemaphores_.clear();
     inFlightFences_.clear();
@@ -185,6 +195,8 @@ void VulkanGraphicAPI::shutdown() {
     device_.reset();
 
     surface_.reset();
+
+    destroyDebugMessenger(rawInstance);
 
     instance_.reset();
 
