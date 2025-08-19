@@ -82,6 +82,8 @@ void VulkanGraphicAPI::initialize() {
 }
 
 void VulkanGraphicAPI::beginFrame() {
+    vkWaitForFences(device_, 1, &inFlightFences_[currentFrame_], VK_TRUE, UINT64_MAX);
+    
     VkResult result = vkAcquireNextImageKHR(
             device_,
             swapchain_,
