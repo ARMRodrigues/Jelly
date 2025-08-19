@@ -2,6 +2,7 @@
 
 #include "jelly/error.hpp"
 #include "jelly/exception.hpp"
+#include "jelly/graphics/mesh_factory.hpp"
 #include "jelly/graphics/shader_factory.hpp"
 #include "jelly/graphics/material_factory.hpp"
 
@@ -151,6 +152,7 @@ void VulkanGraphicAPI::shutdown() {
         vkDeviceWaitIdle(device_);
     }
 
+    jelly::graphics::MeshFactory::releaseAll();
     jelly::graphics::ShaderFactory::releaseAll();
     jelly::graphics::MaterialFactory::releaseAll();
 

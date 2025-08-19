@@ -27,6 +27,10 @@ public:
     ///
     /// This function is called during the rendering loop to draw the mesh.
     virtual void draw() const = 0;
+
+    /// @brief Releases all GPU resources associated with this shader
+    /// @note Must be called before destruction if the shader needs explicit cleanup
+    virtual void release() = 0;
 };
 
 /// @brief A shared pointer to a Mesh object, used for managing its lifecycle.

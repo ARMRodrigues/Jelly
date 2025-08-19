@@ -1,15 +1,19 @@
 #pragma once
 
+#include "mesh.hpp"
+#include "graphic_context.hpp"
+
+#include "vulkan/vulkan_mesh.hpp"
+#include "vulkan/vulkan_graphic_api.hpp"
+
 #include "jelly/jelly_export.hpp"
 
 #include "jelly/core/graphic_api_type.hpp"
 
-#include "jelly/graphics/mesh.hpp"
-#include "jelly/graphics/graphic_context.hpp"
-#include "jelly/graphics/vulkan/vulkan_mesh.hpp"
-#include "jelly/graphics/vulkan/vulkan_graphic_api.hpp"
-
-#include <stdexcept> // Required for std::runtime_error
+#include <stdexcept>
+#include <memory>
+#include <mutex>
+#include <vector>
 
 namespace jelly::graphics {
 
@@ -26,19 +30,19 @@ public:
     /// uploaded to it using the `Mesh::upload()` method before it can be drawn.
     /// @return A `MeshHandle` to the newly created, API-specific mesh.
     /// @throws std::runtime_error if the graphics API from the context is unsupported.
-    static MeshHandle create() {
-        auto& context = GraphicContext::get();
-        switch (context.getAPIType()) {
-            case core::GraphicAPIType::Vulkan: {
-                auto api = static_cast<vulkan::VulkanGraphicAPI*>(context.getAPI());
-                return std::make_shared<vulkan::VulkanMesh>(
-                    api->getDevice(), api->getPhysicalDevice());
-            }
-            default:
-                // This will be thrown if the API is something other than Vulkan
-                throw std::runtime_error("Unsupported graphics API for MeshFactory");
-        }
-    }
+    static MeshHandle create();
+
+    /// @brief Releases all cached mesh resources
+    /// @note Must be called before graphics device destruction
+    static void releaseAll();
+
+private:
+    /// @brief Registers a mesh instance for tracking and management
+    /// @param mesh The mesh handle to register
+    static void registerMesh(const MeshHandle& mesh);
+
+    static std::vector<std::weak_ptr<Mesh>> meshes_;
+    static std::mutex mutex_;
 };
 
 } // namespace jelly::graphics

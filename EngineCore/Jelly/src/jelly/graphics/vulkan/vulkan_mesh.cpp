@@ -45,10 +45,22 @@ void VulkanMesh::draw() const {
     vkCmdDrawIndexed(cmdBuffer, indexCount_, 1, 0, 0, 0);
 }
 
-void VulkanMesh::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
-                              VkMemoryPropertyFlags properties,
-                              core::ManagedResource<VkBuffer>& buffer,
-                              core::ManagedResource<VkDeviceMemory>& memory) {
+void VulkanMesh::release()
+{
+    if (device_ != VK_NULL_HANDLE) {
+        vertexBuffer_.reset();
+        vertexMemory_.reset();
+        indexBuffer_.reset();
+        indexMemory_.reset();
+    }
+}
+
+void VulkanMesh::createBuffer(
+    VkDeviceSize size, VkBufferUsageFlags usage,
+    VkMemoryPropertyFlags properties,
+    core::ManagedResource<VkBuffer>& buffer,
+    core::ManagedResource<VkDeviceMemory>& memory
+) {
     VkBufferCreateInfo bufferInfo{};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = size;
