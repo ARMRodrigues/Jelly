@@ -5,6 +5,7 @@
 #include "jelly/graphics/mesh_factory.hpp"
 #include "jelly/graphics/shader_factory.hpp"
 #include "jelly/graphics/material_factory.hpp"
+#include "jelly/graphics/texture_factory.hpp"
 
 namespace jelly::graphics::vulkan {
 
@@ -155,6 +156,7 @@ void VulkanGraphicAPI::shutdown() {
     jelly::graphics::MeshFactory::releaseAll();
     jelly::graphics::ShaderFactory::releaseAll();
     jelly::graphics::MaterialFactory::releaseAll();
+    jelly::graphics::TextureFactory::releaseAll();
 
     imageAvailableSemaphores_.clear();
     renderFinishedSemaphores_.clear();

@@ -184,6 +184,20 @@ void VulkanTexture::bind(VkDescriptorSet descriptorSet, uint32_t binding) {
     vkUpdateDescriptorSets(api_->getDevice(), 1, &descriptorWrite, 0, nullptr);
 }
 
+void VulkanTexture::release()
+{
+    if (!api_ || api_->getDevice() == VK_NULL_HANDLE)
+        return;
+
+    sampler_.reset();
+    imageView_.reset();
+    imageMemory_.reset();
+    image_.reset();
+
+    width_  = 0;
+    height_ = 0;
+}
+
 void VulkanTexture::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
     VkDevice device = api_->getDevice();
     VkCommandPool commandPool = api_->getCommandPool();

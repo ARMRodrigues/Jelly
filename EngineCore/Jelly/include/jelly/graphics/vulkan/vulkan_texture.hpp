@@ -36,6 +36,10 @@ public:
     /// @return The height of the texture in pixels
     uint32_t getHeight() const override { return height_; }
 
+    /// @brief Releases GPU resources
+    /// @note Must be called before object destruction
+    void release() override;
+
     /// @brief Gets the Vulkan image handle
     VkImage getVkImage() const { return image_.get(); }
 
