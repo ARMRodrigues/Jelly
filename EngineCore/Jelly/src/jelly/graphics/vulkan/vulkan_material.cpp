@@ -53,6 +53,14 @@ void VulkanMaterial::VulkanMaterial::unbind() {
     // No-op (Vulkan não precisa de unbind explícito)
 }
 
+void VulkanMaterial::release()
+{
+    if (pipeline_) {
+        pipeline_.reset();
+        pipelineLayout_.reset();
+    }
+}
+
 void VulkanMaterial::setVec3(const char* name, const float* vec) {
     auto vulkanShader = std::dynamic_pointer_cast<VulkanShader>(getShader());
     if (vulkanShader)

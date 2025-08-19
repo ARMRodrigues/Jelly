@@ -95,6 +95,7 @@ set(SRC_FILES
     ${SRC_DIR}/core/camera_system.cpp
     ${SRC_DIR}/graphics/graphic_context.cpp
     ${SRC_DIR}/graphics/shader_factory.cpp
+    ${SRC_DIR}/graphics/material_factory.cpp
     ${SRC_DIR}/graphics/mesh_renderer_system.cpp
     ${SRC_DIR}/graphics/image.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api.cpp

@@ -3,6 +3,7 @@
 #include "jelly/error.hpp"
 #include "jelly/exception.hpp"
 #include "jelly/graphics/shader_factory.hpp"
+#include "jelly/graphics/material_factory.hpp"
 
 namespace jelly::graphics::vulkan {
 
@@ -151,6 +152,7 @@ void VulkanGraphicAPI::shutdown() {
     }
 
     jelly::graphics::ShaderFactory::releaseAll();
+    jelly::graphics::MaterialFactory::releaseAll();
 
     imageAvailableSemaphores_.clear();
     renderFinishedSemaphores_.clear();

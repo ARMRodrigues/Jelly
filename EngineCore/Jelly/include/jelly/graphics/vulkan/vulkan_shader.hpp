@@ -39,7 +39,6 @@ public:
 
     /// @brief Releases all GPU resources associated with this shader
     /// @note Must be called before destruction if the shader needs explicit cleanup
-    virtual void release() = 0;
     void release() override;
 
     /// @brief Sets vec3 uniform value
