@@ -110,6 +110,14 @@ private:
     uint32_t currentImageIndex_ = 0;
     static constexpr int maxFramesInFlight_ = 2;
 
+#ifdef JELLY_DEBUG
+    VkDebugUtilsMessengerEXT debugMessenger_ = VK_NULL_HANDLE;
+
+    void setupDebugMessenger();
+    void populateDebugCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+    void destroyDebugMessenger();
+#endif
+
     // === Initialization steps ===
     void createInstance();
     void createSurface();

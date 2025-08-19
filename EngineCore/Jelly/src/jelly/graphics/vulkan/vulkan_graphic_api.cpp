@@ -196,7 +196,9 @@ void VulkanGraphicAPI::shutdown() {
 
     surface_.reset();
 
-    destroyDebugMessenger(rawInstance);
+#ifdef JELLY_DEBUG
+    destroyDebugMessenger();
+#endif
 
     instance_.reset();
 
