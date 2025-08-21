@@ -33,7 +33,8 @@ void VulkanMaterial::bind() {
     auto vkShader = static_cast<jelly::graphics::vulkan::VulkanShader*>(shader_.get());
 
     VkCommandBuffer cmd = api->getCurrentCommandBuffer();
-    VkDescriptorSet descriptorSet = vkShader->getDescriptorSet();
+    uint32_t frameIndex = api->getCurrentFrameIndex();
+    VkDescriptorSet descriptorSet = vkShader->getDescriptorSet(frameIndex);
 
     for (auto& [type, texture] : textures_) {
         uint32_t binding = getBindingForTextureType(type);

@@ -2,24 +2,21 @@
 
 #include "vulkan_graphic_api.hpp"
 #include "vulkan_shader_module.hpp"
-
 #include "jelly/jelly_export.hpp"
-
 #include "jelly/core/managed_resource.hpp"
-
 #include "jelly/graphics/shader_interface.hpp"
 
 #include <vulkan/vulkan.h>
-
 #include <memory>
+#include <array>
 
 namespace jelly::graphics::vulkan {
 
 /// @brief Packed shader uniforms (16-byte aligned)
 struct alignas(16) ShaderUniforms {
-    float model[16];      ///< Model transformation matrix
-    float view[16];       ///< View matrix
-    float projection[16]; ///< Projection matrix
+    float model[16];      // Model transformation matrix
+    float view[16];       // View matrix
+    float projection[16]; // Projection matrix
 };
 
 /// @brief Vulkan implementation of ShaderInterface
@@ -60,10 +57,14 @@ public:
     /// @brief Gets descriptor set layout
     VkDescriptorSetLayout getDescriptorSetLayout() const;
     
-    /// @brief Gets descriptor set
-    VkDescriptorSet getDescriptorSet() const;
+    /// @brief Gets descriptor set for specific frame index
+    /// @param frameIndex Index of the frame (0 to MAX_FRAMES_IN_FLIGHT-1)
+    /// @return Vulkan descriptor set handle
+    VkDescriptorSet getDescriptorSet(uint32_t frameIndex) const; 
 
 private:
+    static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+
     VulkanGraphicAPI* api_;
     std::unique_ptr<VulkanShaderModule> vertex_;
     std::unique_ptr<VulkanShaderModule> fragment_;
@@ -71,14 +72,14 @@ private:
     ShaderUniforms uniforms_;
 
     // Managed Vulkan resources
-    jelly::core::ManagedResource<VkBuffer> uniformBuffer_;
-    jelly::core::ManagedResource<VkDeviceMemory> uniformBufferMemory_;
+    std::array<jelly::core::ManagedResource<VkBuffer>, MAX_FRAMES_IN_FLIGHT> uniformBuffers_;
+    std::array<jelly::core::ManagedResource<VkDeviceMemory>, MAX_FRAMES_IN_FLIGHT> uniformBufferMemories_;
     jelly::core::ManagedResource<VkDescriptorSetLayout> descriptorSetLayout_;
     jelly::core::ManagedResource<VkDescriptorPool> descriptorPool_;
-    VkDescriptorSet descriptorSet_ = VK_NULL_HANDLE;
+    std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> descriptorSets_{};
 
-    /// @brief Creates uniform buffer
-    void createUniformBuffer();
+    /// @brief Creates uniform buffers
+    void createUniformBuffers();
     
     /// @brief Creates descriptor set layout  
     void createDescriptorSetLayout();
@@ -86,11 +87,11 @@ private:
     /// @brief Creates descriptor pool
     void createDescriptorPool();
     
-    /// @brief Allocates descriptor set
-    void allocateDescriptorSet();
+    /// @brief Allocates descriptor sets
+    void allocateDescriptorSets();
     
-    /// @brief Updates descriptor set bindings
-    void updateDescriptorSet();
+    /// @brief Updates descriptor sets bindings
+    void updateDescriptorSets();
 };
 
 } // namespace jelly::graphics::vulkan
