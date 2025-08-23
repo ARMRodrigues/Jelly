@@ -107,7 +107,9 @@ private:
 
     // === Synchronization ===
     std::vector<VkSemaphore> imageAvailableSemaphores_;
+    std::vector<VkSemaphore> imageAvailableSemaphoresPerImage_;
     std::vector<VkSemaphore> renderFinishedSemaphores_;
+    std::vector<VkSemaphore> renderFinishedSemaphoresPerImage_;
     std::vector<VkFence> inFlightFences_;
     std::vector<VkFence> imagesInFlight_;
 

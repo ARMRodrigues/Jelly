@@ -84,13 +84,15 @@ void VulkanGraphicAPI::initialize() {
 void VulkanGraphicAPI::beginFrame() {
     vkWaitForFences(device_, 1, &inFlightFences_[currentFrame_], VK_TRUE, UINT64_MAX);
 
+    uint32_t imageIndex = 0;
     VkResult result = vkAcquireNextImageKHR(
-            device_,
-            swapchain_,
-            UINT64_MAX,
-            imageAvailableSemaphores_[currentFrame_],
-            VK_NULL_HANDLE,
-            &currentImageIndex_);
+        device_,
+        swapchain_,
+        UINT64_MAX,
+        imageAvailableSemaphores_[currentFrame_],
+        VK_NULL_HANDLE,
+        &imageIndex
+    );
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         recreateSwapchain();
@@ -99,46 +101,48 @@ void VulkanGraphicAPI::beginFrame() {
         throw Exception("Failed to acquire swap chain image!");
     }
 
+    currentImageIndex_ = imageIndex;
+
     if (imagesInFlight_[currentImageIndex_] != VK_NULL_HANDLE) {
         vkWaitForFences(device_, 1, &imagesInFlight_[currentImageIndex_], VK_TRUE, UINT64_MAX);
     }
+
+    imagesInFlight_[currentImageIndex_] = inFlightFences_[currentFrame_];
 
     vkResetFences(device_, 1, &inFlightFences_[currentFrame_]);
 
     beginCommandBuffer(commandBuffers_[currentImageIndex_], currentImageIndex_);
 }
 
+
 void VulkanGraphicAPI::endFrame() {
     endCommandBuffer(commandBuffers_[currentImageIndex_]);
 
     VkSubmitInfo submitInfo{VK_STRUCTURE_TYPE_SUBMIT_INFO};
+    VkSemaphore waitSemaphores[]  = { imageAvailableSemaphores_[currentFrame_] };
+    VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+    VkSemaphore signalSemaphores[] = { renderFinishedSemaphoresPerImage_[currentImageIndex_] };
 
-    VkSemaphore waitSemaphores[] = {imageAvailableSemaphores_[currentFrame_]};
-    VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     submitInfo.waitSemaphoreCount = 1;
-    submitInfo.pWaitSemaphores = waitSemaphores;
-    submitInfo.pWaitDstStageMask = waitStages;
+    submitInfo.pWaitSemaphores    = waitSemaphores;
+    submitInfo.pWaitDstStageMask  = waitStages;
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &commandBuffers_[currentImageIndex_];
-
-    VkSemaphore signalSemaphores[] = {renderFinishedSemaphores_[currentFrame_]};
+    submitInfo.pCommandBuffers    = &commandBuffers_[currentImageIndex_];
     submitInfo.signalSemaphoreCount = 1;
-    submitInfo.pSignalSemaphores = signalSemaphores;
+    submitInfo.pSignalSemaphores    = signalSemaphores;
 
     if (vkQueueSubmit(graphicsQueue_, 1, &submitInfo, inFlightFences_[currentFrame_]) != VK_SUCCESS) {
         throw Exception("Failed to submit draw command buffer!");
     }
-    
-    imagesInFlight_[currentImageIndex_] = inFlightFences_[currentFrame_];
 
-    VkSwapchainKHR const* rawSwapchainPtr = std::addressof(swapchain_.ref());
+    VkSwapchainKHR swapchains[] = { swapchain_.get() };
 
     VkPresentInfoKHR presentInfo{VK_STRUCTURE_TYPE_PRESENT_INFO_KHR};
     presentInfo.waitSemaphoreCount = 1;
-    presentInfo.pWaitSemaphores = signalSemaphores;
-    presentInfo.swapchainCount = 1;
-    presentInfo.pSwapchains = rawSwapchainPtr;
-    presentInfo.pImageIndices = &currentImageIndex_;
+    presentInfo.pWaitSemaphores    = signalSemaphores;
+    presentInfo.swapchainCount     = 1;
+    presentInfo.pSwapchains        = swapchains;
+    presentInfo.pImageIndices      = &currentImageIndex_;
 
     VkResult result = vkQueuePresentKHR(presentQueue_, &presentInfo);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
@@ -160,7 +164,6 @@ void VulkanGraphicAPI::shutdown() {
     jelly::graphics::MaterialFactory::releaseAll();
     jelly::graphics::TextureFactory::releaseAll();
 
-    // Destrói semáforos e fences
     for (VkSemaphore sem : imageAvailableSemaphores_)
         if (sem) vkDestroySemaphore(device_, sem, nullptr);
 
@@ -169,6 +172,15 @@ void VulkanGraphicAPI::shutdown() {
 
     for (VkFence f : inFlightFences_)
         if (f) vkDestroyFence(device_, f, nullptr);
+    
+    for (VkSemaphore sem : imageAvailableSemaphoresPerImage_)
+    if (sem) vkDestroySemaphore(device_, sem, nullptr);
+
+    for (VkSemaphore sem : renderFinishedSemaphoresPerImage_)
+        if (sem) vkDestroySemaphore(device_, sem, nullptr);
+
+    imageAvailableSemaphoresPerImage_.clear();
+    renderFinishedSemaphoresPerImage_.clear();
 
     imageAvailableSemaphores_.clear();
     renderFinishedSemaphores_.clear();
