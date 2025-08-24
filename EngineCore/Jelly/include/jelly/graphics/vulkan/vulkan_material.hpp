@@ -68,6 +68,13 @@ private:
         VkShaderModule fragShaderModule,
         VkExtent2D extent
     );
+
+    /// @brief Updates texture descriptor sets for all frames
+    /// 
+    /// Binds texture image views and samplers to the shader's descriptor sets.
+    /// Must be called after texture changes and before rendering.
+    /// Updates descriptors for both frames in flight (double buffering).
+    void updateTexturesDescriptor();
 };
 
 } // namespace jelly::graphics::vulkan

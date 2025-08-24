@@ -61,8 +61,9 @@ void VulkanShader::createUniformBuffers() {
             }
         }
 
-        if (memoryTypeIndex == UINT32_MAX)
+        if (memoryTypeIndex == UINT32_MAX) {
             throw std::runtime_error("Failed to find suitable memory type for uniform buffer");
+        }
 
         VkMemoryAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -70,8 +71,9 @@ void VulkanShader::createUniformBuffers() {
         allocInfo.memoryTypeIndex = memoryTypeIndex;
 
         VkDeviceMemory memory;
-        if (vkAllocateMemory(device, &allocInfo, nullptr, &memory) != VK_SUCCESS)
+        if (vkAllocateMemory(device, &allocInfo, nullptr, &memory) != VK_SUCCESS) {
             throw std::runtime_error("Failed to allocate uniform buffer memory");
+        }
 
         uniformBufferMemories_[i] = jelly::core::ManagedResource<VkDeviceMemory>(
             memory, [device](VkDeviceMemory m){ vkFreeMemory(device, m, nullptr); }, VK_NULL_HANDLE
@@ -88,10 +90,9 @@ void VulkanShader::createDescriptorSetLayout() {
     uboLayoutBinding.binding = 0;
     uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     uboLayoutBinding.descriptorCount = 1;
-    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT; // view/proj/model no vertex
+    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
     uboLayoutBinding.pImmutableSamplers = nullptr;
 
-    // Binding 1 → Combined Image Sampler
     VkDescriptorSetLayoutBinding samplerLayoutBinding{};
     samplerLayoutBinding.binding = 1;
     samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -167,21 +168,30 @@ void VulkanShader::updateDescriptorSets() {
     VkDevice device = api_->getDevice();
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+        std::vector<VkWriteDescriptorSet> descriptorWrites;
+
         VkDescriptorBufferInfo bufferInfo{};
         bufferInfo.buffer = uniformBuffers_[i].get();
         bufferInfo.offset = 0;
         bufferInfo.range = sizeof(ShaderUniforms);
 
-        VkWriteDescriptorSet descriptorWrite{};
-        descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrite.dstSet = descriptorSets_[i];
-        descriptorWrite.dstBinding = 0;
-        descriptorWrite.dstArrayElement = 0;
-        descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        descriptorWrite.descriptorCount = 1;
-        descriptorWrite.pBufferInfo = &bufferInfo;
+        VkWriteDescriptorSet bufferWrite{};
+        bufferWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        bufferWrite.dstSet = descriptorSets_[i];
+        bufferWrite.dstBinding = 0;
+        bufferWrite.dstArrayElement = 0;
+        bufferWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        bufferWrite.descriptorCount = 1;
+        bufferWrite.pBufferInfo = &bufferInfo;
+        descriptorWrites.push_back(bufferWrite);
 
-        vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
+        if (!descriptorWrites.empty()) {
+            vkUpdateDescriptorSets(
+                device, 
+                static_cast<uint32_t>(descriptorWrites.size()), 
+                descriptorWrites.data(), 0, nullptr
+            );
+        }
     }
 }
 
@@ -195,21 +205,17 @@ void VulkanShader::unbind() {
 
 void VulkanShader::release() {
     if (api_ && api_->getDevice() != VK_NULL_HANDLE) {
-        // Destroi os módulos de shader
         fragment_.reset();
         vertex_.reset();
 
-        // Destroi uniform buffers e memórias de cada frame
         for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             uniformBuffers_[i].reset();
             uniformBufferMemories_[i].reset();
         }
 
-        // Destroi o layout e o pool
         descriptorSetLayout_.reset();
         descriptorPool_.reset();
 
-        // Sets são destruídos junto com o pool, apenas limpa o array
         descriptorSets_.fill(VK_NULL_HANDLE);
     }
 }
@@ -232,6 +238,27 @@ void VulkanShader::setUniformMat4(const char* name, const float* matrix) {
     vkMapMemory(api_->getDevice(), uniformBufferMemories_[frame], 0, sizeof(ShaderUniforms), 0, &data);
     memcpy(data, &uniforms_, sizeof(ShaderUniforms));
     vkUnmapMemory(api_->getDevice(), uniformBufferMemories_[frame]);
+}
+
+void VulkanShader::updateTextureDescriptor(VkImageView imageView, VkSampler sampler, uint32_t binding, uint32_t frameIndex)
+{
+    VkDevice device = api_->getDevice();
+    
+    VkDescriptorImageInfo imageInfo{};
+    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    imageInfo.imageView = imageView;
+    imageInfo.sampler = sampler;
+
+    VkWriteDescriptorSet descriptorWrite{};
+    descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    descriptorWrite.dstSet = descriptorSets_[frameIndex];
+    descriptorWrite.dstBinding = binding;
+    descriptorWrite.dstArrayElement = 0;
+    descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    descriptorWrite.descriptorCount = 1;
+    descriptorWrite.pImageInfo = &imageInfo;
+
+    vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
 }
 
 const VulkanShaderModule* VulkanShader::getVertexModule() const {

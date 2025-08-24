@@ -28,6 +28,25 @@ uint32_t getBindingForTextureType(TextureType type) {
     }
 }
 
+void VulkanMaterial::updateTexturesDescriptor() {
+    auto api = static_cast<VulkanGraphicAPI*>(jelly::graphics::GraphicContext::get().getAPI());
+    auto vkShader = static_cast<jelly::graphics::vulkan::VulkanShader*>(shader_.get());
+    
+    for (uint32_t frame = 0; frame < 2; ++frame) {
+        for (auto& [type, texture] : textures_) {
+            uint32_t binding = getBindingForTextureType(type);
+            auto vkTexture = static_cast<VulkanTexture*>(texture.get());
+            
+            vkShader->updateTextureDescriptor(
+                vkTexture->getVkImageView(),
+                vkTexture->getVkSampler(),
+                binding,
+                frame
+            );
+        }
+    }
+}
+
 void VulkanMaterial::bind() {
     auto api = static_cast<VulkanGraphicAPI*>(jelly::graphics::GraphicContext::get().getAPI());
     auto vkShader = static_cast<jelly::graphics::vulkan::VulkanShader*>(shader_.get());
@@ -36,11 +55,6 @@ void VulkanMaterial::bind() {
     uint32_t frameIndex = api->getCurrentFrameIndex();
     VkDescriptorSet descriptorSet = vkShader->getDescriptorSet(frameIndex);
 
-    for (auto& [type, texture] : textures_) {
-        uint32_t binding = getBindingForTextureType(type);
-        texture->bind(descriptorSet, binding);
-    }
-
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_.get());
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout_.get(), 0, 1, &descriptorSet, 0, nullptr);
 }
@@ -48,6 +62,8 @@ void VulkanMaterial::bind() {
 void VulkanMaterial::setAlbedoTexture(std::shared_ptr<TextureInterface> texture)
 {
     textures_[TextureType::Albedo] = std::static_pointer_cast<VulkanTexture>(texture);
+
+    updateTexturesDescriptor();
 }
 
 void VulkanMaterial::VulkanMaterial::unbind() {

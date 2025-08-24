@@ -166,24 +166,6 @@ void VulkanTexture::upload(const Image& image) {
     );
 }
 
-void VulkanTexture::bind(VkDescriptorSet descriptorSet, uint32_t binding) {
-    VkDescriptorImageInfo imageInfo{};
-    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    imageInfo.imageView   = imageView_.get();
-    imageInfo.sampler     = sampler_.get();
-
-    VkWriteDescriptorSet descriptorWrite{};
-    descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    descriptorWrite.dstSet = descriptorSet;
-    descriptorWrite.dstBinding = binding; // binding definido no shader
-    descriptorWrite.dstArrayElement = 0;
-    descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    descriptorWrite.descriptorCount = 1;
-    descriptorWrite.pImageInfo = &imageInfo;
-
-    vkUpdateDescriptorSets(api_->getDevice(), 1, &descriptorWrite, 0, nullptr);
-}
-
 void VulkanTexture::release()
 {
     if (!api_ || api_->getDevice() == VK_NULL_HANDLE)
@@ -203,7 +185,6 @@ void VulkanTexture::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t w
     VkCommandPool commandPool = api_->getCommandPool();
     VkQueue graphicsQueue = api_->getGraphicsQueue();
 
-    // Allocate temporary command buffer
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;

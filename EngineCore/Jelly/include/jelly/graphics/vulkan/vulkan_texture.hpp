@@ -23,11 +23,6 @@ public:
     /// @param image The image data to upload
     void upload(const Image& image) override;
 
-    /// @brief Binds the texture to a descriptor set
-    /// @param descriptorSet Target descriptor set to bind to
-    /// @param binding Binding point in the descriptor set
-    void bind(VkDescriptorSet descriptorSet, uint32_t binding);
-
     /// @brief Gets the texture width in pixels
     /// @return The width of the texture in pixels
     uint32_t getWidth() const override { return width_; }

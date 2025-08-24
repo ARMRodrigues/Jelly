@@ -48,6 +48,13 @@ public:
     /// @param matrix Pointer to 16 consecutive floats (column-major)
     void setUniformMat4(const char* name, const float* matrix) override;
 
+    /// @brief Updates texture binding in descriptor set
+    /// @param imageView Texture image view to bind
+    /// @param sampler Texture sampler to bind
+    /// @param binding Binding point in the shader
+    /// @param frameIndex Frame index for double buffering (0 or 1)
+    void updateTextureDescriptor(VkImageView imageView, VkSampler sampler, uint32_t binding, uint32_t frameIndex);
+
     /// @brief Gets vertex shader module
     const VulkanShaderModule* getVertexModule() const;
     
