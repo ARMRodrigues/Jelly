@@ -1,6 +1,8 @@
 #include "jelly/graphics/vulkan/vulkan_shader_module.hpp"
+
 #include <stdexcept>
 #include <iostream>
+
 namespace jelly::graphics::vulkan {
 
 VulkanShaderModule::VulkanShaderModule(
@@ -8,7 +10,7 @@ VulkanShaderModule::VulkanShaderModule(
     const std::vector<uint8_t>& spirvCode,
     VkShaderStageFlagBits stage
 )
-    : device_(device), stage_(stage)
+    : device_(device), spirvCode_(spirvCode), stage_(stage)
 {
 
     if (device == VK_NULL_HANDLE) {

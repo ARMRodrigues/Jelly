@@ -87,6 +87,7 @@ set(HEADERS
 
 # Source files
 set(SRC_FILES
+    ${SRC_DIR}/../spirv-reflect/spirv_reflect.cpp
     ${SRC_DIR}/jelly.cpp
     ${SRC_DIR}/core/logger.cpp
     ${SRC_DIR}/core/scene.cpp
@@ -148,11 +149,13 @@ set_target_properties(Jelly PROPERTIES
 
 # Preprocessor definitions
 target_compile_definitions(Jelly PRIVATE JELLY_BUILD_DLL)
+target_compile_definitions(Jelly PUBLIC SPIRV_REFLECT_USE_SYSTEM_SPIRV_H)
 
 # Include directories
 target_include_directories(Jelly PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${glm_SOURCE_DIR}
+    ${Vulkan_INCLUDE_DIRS}
 )
 
 # Linked libraries

@@ -29,10 +29,15 @@ public:
     /// @return VkShaderStageFlagBits indicating the shader stage.
     VkShaderStageFlagBits getStage() const { return stage_; }
 
+    /// @brief Returns the SPIR-V bytecode used to create this shader module
+    /// @return Reference to the SPIR-V bytecode vector
+    const std::vector<uint8_t>& getSPIRVCode() const { return spirvCode_; }
+
 private:
-    VkDevice device_;                   ///< Logical device used for module creation.
-    VkShaderModule module_;             ///< Vulkan shader module handle.
-    VkShaderStageFlagBits stage_;       ///< Shader stage associated with this module.
+    VkDevice device_;                   // Logical device used for module creation.
+    VkShaderModule module_;             // Vulkan shader module handle.
+    VkShaderStageFlagBits stage_;       // Shader stage associated with this module.
+    std::vector<uint8_t> spirvCode_;    // SPIR-V bytecode vector
 };
 
 } // namespace jelly::graphics::vulkan

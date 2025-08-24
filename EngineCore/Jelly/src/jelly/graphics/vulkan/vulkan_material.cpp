@@ -18,23 +18,13 @@ VulkanMaterial::VulkanMaterial(std::shared_ptr<ShaderInterface> shader)
     : MaterialInterface(shader), shader_(shader)
 {}
 
-uint32_t getBindingForTextureType(TextureType type) {
-    switch (type) {
-        case TextureType::Albedo:   return 1;
-        case TextureType::Normal:   return 2;
-        //case TextureType::Roughness:return 2;
-        // Add more later
-        default: return 1;
-    }
-}
-
 void VulkanMaterial::updateTexturesDescriptor() {
     auto api = static_cast<VulkanGraphicAPI*>(jelly::graphics::GraphicContext::get().getAPI());
     auto vkShader = static_cast<jelly::graphics::vulkan::VulkanShader*>(shader_.get());
     
     for (uint32_t frame = 0; frame < 2; ++frame) {
         for (auto& [type, texture] : textures_) {
-            uint32_t binding = getBindingForTextureType(type);
+            uint32_t binding = vkShader->getTextureBinding("albedoTexture");
             auto vkTexture = static_cast<VulkanTexture*>(texture.get());
             
             vkShader->updateTextureDescriptor(
@@ -67,7 +57,7 @@ void VulkanMaterial::setAlbedoTexture(std::shared_ptr<TextureInterface> texture)
 }
 
 void VulkanMaterial::VulkanMaterial::unbind() {
-    // No-op (Vulkan não precisa de unbind explícito)
+    // No-op (Vulkan does not require explicit unbind)
 }
 
 void VulkanMaterial::release()
@@ -107,10 +97,9 @@ void VulkanMaterial::createPipeline(VulkanGraphicAPI* api) {
 
     VkDescriptorSetLayout setLayout = vkShader->getDescriptorSetLayout();
 
-    // Create pipeline layout (example, customize as needed)
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 1; // temos 1 set layout
+    pipelineLayoutInfo.setLayoutCount = 1;
     pipelineLayoutInfo.pSetLayouts = &setLayout;
     pipelineLayoutInfo.pushConstantRangeCount = 0;
 
@@ -125,7 +114,6 @@ void VulkanMaterial::createPipeline(VulkanGraphicAPI* api) {
         VK_NULL_HANDLE
     );
 
-    // Create graphics pipeline (you must get shader modules from shader_)
     VkPipeline rawPipeline = createGraphicsPipeline(
         device,
         renderPass,
