@@ -23,16 +23,7 @@ public:
     ~VulkanMesh() override;
 
     /// @brief Uploads vertex and index data to GPU
-    /// @param vertexData Pointer to vertex data
-    /// @param vertexSize Size of vertex data in bytes
-    /// @param indexData Pointer to index data
-    /// @param indexSize Size of index data in bytes
-    void upload(
-        const void* vertexData,
-        size_t vertexSize,
-        const void* indexData,
-        size_t indexSize
-    ) override;
+    void upload() override;
 
     /// @brief Issues draw commands for this mesh
     void draw() const override;

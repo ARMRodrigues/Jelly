@@ -1,4 +1,5 @@
 #include "jelly/graphics/mesh_factory.hpp"
+
 #include <stdexcept>
 
 namespace jelly::graphics {
@@ -6,7 +7,7 @@ namespace jelly::graphics {
 std::vector<std::weak_ptr<Mesh>> MeshFactory::meshes_;
 std::mutex MeshFactory::mutex_;
 
-MeshHandle MeshFactory::create() {
+MeshHandle MeshFactory::createMeshHandle() {
     auto& context = GraphicContext::get();
     switch (context.getAPIType()) {
         case core::GraphicAPIType::Vulkan: {
@@ -19,6 +20,34 @@ MeshHandle MeshFactory::create() {
         default:
             throw std::runtime_error("Unsupported graphics API for MeshFactory");
     }
+}
+
+MeshHandle MeshFactory::quad()
+{
+    auto mesh = createMeshHandle();
+
+    mesh->setPositions({
+        {-0.5f, -0.5f, 0.0f}, // bottom-left
+        { 0.5f, -0.5f, 0.0f}, // bottom-right
+        { 0.5f,  0.5f, 0.0f}, // top-right
+        {-0.5f,  0.5f, 0.0f}  // top-left
+    });
+
+    mesh->setUV0({
+        {0.0f, 0.0f}, // bottom-left
+        {1.0f, 0.0f}, // bottom-right
+        {1.0f, 1.0f}, // top-right
+        {0.0f, 1.0f}  // top-left
+    });
+
+    mesh->setIndices({
+        0, 1, 2,
+        2, 3, 0
+    });
+
+    mesh->upload();
+
+    return mesh;
 }
 
 void MeshFactory::releaseAll() {

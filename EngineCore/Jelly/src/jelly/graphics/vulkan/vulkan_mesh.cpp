@@ -12,26 +12,34 @@ VulkanMesh::VulkanMesh(VkDevice device, VkPhysicalDevice physicalDevice)
 
 VulkanMesh::~VulkanMesh() = default;
 
-void VulkanMesh::upload(const void* vertexData, size_t vertexSize,
-                        const void* indexData, size_t indexSize) {
-    createBuffer(vertexSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                 vertexBuffer_, vertexMemory_);
+void VulkanMesh::upload() {
+    auto vertices = buildVertexBuffer();
+
+    VkDeviceSize vertexSize = vertices.size() * sizeof(Vertex);
+
+    createBuffer(vertexSize,
+        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        vertexBuffer_, vertexMemory_
+    );
 
     void* data = nullptr;
     vkMapMemory(device_, vertexMemory_.get(), 0, vertexSize, 0, &data);
-    std::memcpy(data, vertexData, vertexSize);
+    std::memcpy(data, vertices.data(), static_cast<size_t>(vertexSize));
     vkUnmapMemory(device_, vertexMemory_.get());
 
-    createBuffer(indexSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                 indexBuffer_, indexMemory_);
+    VkDeviceSize indexSize = indices_.size() * sizeof(uint32_t);
+    createBuffer(indexSize,
+        VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        indexBuffer_, indexMemory_
+    );
 
     vkMapMemory(device_, indexMemory_.get(), 0, indexSize, 0, &data);
-    std::memcpy(data, indexData, indexSize);
+    std::memcpy(data, indices_.data(), static_cast<size_t>(indexSize));
     vkUnmapMemory(device_, indexMemory_.get());
 
-    indexCount_ = static_cast<uint32_t>(indexSize / sizeof(uint32_t));
+    indexCount_ = static_cast<uint32_t>(indices_.size());
 }
 
 void VulkanMesh::draw() const {

@@ -30,7 +30,11 @@ public:
     /// uploaded to it using the `Mesh::upload()` method before it can be drawn.
     /// @return A `MeshHandle` to the newly created, API-specific mesh.
     /// @throws std::runtime_error if the graphics API from the context is unsupported.
-    static MeshHandle create();
+    static MeshHandle createMeshHandle();
+
+    /// @brief Creates a quad mesh (two triangles forming a rectangle)
+    /// @return A MeshHandle to a quad mesh with predefined vertex data
+    static MeshHandle quad();
 
     /// @brief Releases all cached mesh resources
     /// @note Must be called before graphics device destruction

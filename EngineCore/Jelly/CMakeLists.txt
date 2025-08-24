@@ -95,6 +95,7 @@ set(SRC_FILES
     ${SRC_DIR}/core/transform_system.cpp
     ${SRC_DIR}/core/camera_system.cpp
     ${SRC_DIR}/graphics/graphic_context.cpp
+    ${SRC_DIR}/graphics/mesh.cpp
     ${SRC_DIR}/graphics/mesh_factory.cpp
     ${SRC_DIR}/graphics/shader_factory.cpp
     ${SRC_DIR}/graphics/material_factory.cpp
