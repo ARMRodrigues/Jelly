@@ -1,6 +1,7 @@
 #include "jelly/jelly.hpp"
 
 #include "jelly/exception.hpp"
+#include "jelly/core/game_time.hpp"
 #include "jelly/graphics/graphic_context.hpp"
 #include "jelly/graphics/graphic_api_factory.hpp"
 #include "jelly/windowing/window_system_factory.hpp"
@@ -40,6 +41,8 @@ bool Jelly::initialize(GraphicAPIType graphicAPIType, const WindowSettings &wind
 
     graphics::GraphicContext::get().initialize(graphicAPIType, graphicAPI_.get());
 
+    jelly::core::GameTime::initialize();
+
     return true;
 }
 
@@ -48,6 +51,8 @@ bool Jelly::isHeadless() const {
 }
 
 bool Jelly::isRunning() const {
+    // TODO : move to proper place later
+    jelly::core::GameTime::update();
     if (isHeadless_) return true;
     return windowSystem_ && windowSystem_->isWindowOpen();
 }

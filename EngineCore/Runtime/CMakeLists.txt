@@ -2,7 +2,7 @@ project(Runtime LANGUAGES CXX)
 
 # Executable target
 add_executable(Runtime
-    src/main.cpp
+    src/rotate_mesh_system.hpp src/main.cpp
 )
 
 # Link with Jelly library

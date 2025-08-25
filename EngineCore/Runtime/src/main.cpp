@@ -18,6 +18,8 @@
 #include "jelly/graphics/texture_factory.hpp"
 #include "jelly/graphics/material.hpp"
 
+#include "rotate_mesh_system.hpp"
+
 int main() {
     jelly::Jelly jelly;
 
@@ -67,13 +69,17 @@ int main() {
     auto material = jelly::graphics::MaterialFactory::create(shader);
     material->setAlbedoTexture(texture);
 
-    auto mesh = jelly::graphics::MeshFactory::quad();
+    auto mesh = jelly::graphics::MeshFactory::cube();
 
     registry.emplace<jelly::graphics::MeshComponent>(entity, mesh);
     registry.emplace<jelly::graphics::MaterialComponent>(entity, material);
+    registry.emplace<Rotate>(entity, 1.0f);
 
     auto meshRendererSystem = std::make_shared<jelly::graphics::MeshRendererSystem>(scene->getEntityManager());
     scene->addGameSystem(meshRendererSystem);
+
+    auto rotateSystem = std::make_shared<RotateMeshSystem>(scene->getEntityManager());
+    scene->addGameSystem(rotateSystem);
 
     auto sceneId = jelly.getSceneManager().addScene(std::move(scene));
     jelly.getSceneManager().setActiveScene(0);
