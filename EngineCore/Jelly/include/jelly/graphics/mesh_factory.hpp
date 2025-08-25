@@ -36,6 +36,10 @@ public:
     /// @return A MeshHandle to a quad mesh with predefined vertex data
     static MeshHandle quad();
 
+    /// @brief Creates a cube mesh
+    /// @return A MeshHandle to a cube mesh with predefined vertex data
+    static MeshHandle cube();
+
     /// @brief Releases all cached mesh resources
     /// @note Must be called before graphics device destruction
     static void releaseAll();

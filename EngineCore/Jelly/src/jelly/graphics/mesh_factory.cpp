@@ -50,6 +50,56 @@ MeshHandle MeshFactory::quad()
     return mesh;
 }
 
+MeshHandle MeshFactory::cube()
+{
+    auto mesh = createMeshHandle();
+
+    std::vector<glm::vec3> positions = {
+        // Front face
+        {-0.5f, -0.5f,  0.5f}, { 0.5f, -0.5f,  0.5f}, { 0.5f,  0.5f,  0.5f}, {-0.5f,  0.5f,  0.5f},
+        // Back face
+        { 0.5f, -0.5f, -0.5f}, {-0.5f, -0.5f, -0.5f}, {-0.5f,  0.5f, -0.5f}, { 0.5f,  0.5f, -0.5f},
+        // Left face
+        {-0.5f, -0.5f, -0.5f}, {-0.5f, -0.5f,  0.5f}, {-0.5f,  0.5f,  0.5f}, {-0.5f,  0.5f, -0.5f},
+        // Right face
+        { 0.5f, -0.5f,  0.5f}, { 0.5f, -0.5f, -0.5f}, { 0.5f,  0.5f, -0.5f}, { 0.5f,  0.5f,  0.5f},
+        // Top face
+        {-0.5f,  0.5f,  0.5f}, { 0.5f,  0.5f,  0.5f}, { 0.5f,  0.5f, -0.5f}, {-0.5f,  0.5f, -0.5f},
+        // Bottom face
+        {-0.5f, -0.5f, -0.5f}, { 0.5f, -0.5f, -0.5f}, { 0.5f, -0.5f,  0.5f}, {-0.5f, -0.5f,  0.5f}
+    };
+
+    mesh->setPositions(positions);
+
+    std::vector<glm::vec2> uv0;
+    for(int i=0;i<6;i++){
+        uv0.push_back({0,0});
+        uv0.push_back({1,0});
+        uv0.push_back({1,1});
+        uv0.push_back({0,1});
+    }
+
+    mesh->setUV0(uv0);
+
+    mesh->setIndices({
+        // Front face
+        0, 1, 2,  0, 2, 3,
+        // Back face
+        4, 5, 6,  4, 6, 7,
+        // Left face
+        8, 9, 10, 8, 10, 11,
+        // Right face
+        12, 13, 14, 12, 14, 15,
+        // Top face
+        16, 17, 18, 16, 18, 19,
+        // Bottom face
+        20, 21, 22, 20, 22, 23
+    });
+
+    mesh->upload();
+    return mesh;
+}
+
 void MeshFactory::releaseAll() {
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto& weakMesh : meshes_) {
