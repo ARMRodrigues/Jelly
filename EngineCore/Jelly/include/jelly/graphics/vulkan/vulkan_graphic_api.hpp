@@ -118,6 +118,11 @@ private:
     uint32_t currentImageIndex_ = 0;
     static constexpr int maxFramesInFlight_ = 2;
 
+    // === Depth resources ===
+    VkImage depthImage_ = VK_NULL_HANDLE;
+    VkDeviceMemory depthImageMemory_ = VK_NULL_HANDLE;
+    VkImageView depthImageView_ = VK_NULL_HANDLE;
+
 #ifdef JELLY_DEBUG
     VkDebugUtilsMessengerEXT debugMessenger_ = VK_NULL_HANDLE;
 
@@ -150,7 +155,10 @@ private:
     
     /// @brief Creates image views for swapchain images
     void createImageViews();
-    
+
+    /// @brief Creates depth buffer resources (image, memory, and view)
+    void createDepthResources();
+
     /// @brief Creates render pass defining attachment operations
     void createRenderPass();
     
@@ -173,6 +181,24 @@ private:
     void cleanupSwapchain();
 
     // === Helper functions ===
+
+    /// @brief Finds a suitable depth buffer format
+    /// @return Vulkan format suitable for depth attachment
+    VkFormat findDepthFormat();
+
+    /// @brief Finds the first supported format from candidate list
+    /// @param candidates List of formats to check
+    /// @param tiling Image tiling requirement
+    /// @param features Required format features
+    /// @return First supported format from candidates
+    VkFormat findSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+
+    /// @brief Finds a suitable memory type for allocation
+    /// @param typeFilter Memory type filter
+    /// @param properties Required memory properties
+    /// @return Index of suitable memory type
+    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
     /// @brief Queries swapchain capabilities for given device and surface
     /// @param device Physical device to query
     /// @param surface Surface to check compatibility with

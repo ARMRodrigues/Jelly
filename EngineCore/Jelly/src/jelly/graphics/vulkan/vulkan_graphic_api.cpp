@@ -51,6 +51,12 @@ void VulkanGraphicAPI::initialize() {
     }
 
     try {
+        createDepthResources();
+    } catch (const Exception& e) {
+        Error::Print(e);
+    }
+
+    try {
         createRenderPass();
     } catch (const Exception& e) {
         Error::Print(e);

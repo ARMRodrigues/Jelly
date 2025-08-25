@@ -109,7 +109,8 @@ set(SRC_FILES
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_pick_physical_device.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_logical_device.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_swapchain.cpp
-    ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_image_views.cpp
+    ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_image_views.cpp    
+    ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_depth_resources.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_render_pass.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_framebuffers.cpp
     ${SRC_DIR}/graphics/vulkan/vulkan_graphic_api_command_pool.cpp

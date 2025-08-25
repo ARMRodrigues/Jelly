@@ -11,13 +11,14 @@ void VulkanGraphicAPI::createFramebuffers() {
 
     for (size_t i = 0; i < swapchainImageViews_.size(); ++i) {
         VkImageView attachments[] = {
-            swapchainImageViews_[i]
+            swapchainImageViews_[i],
+            depthImageView_
         };
 
         VkFramebufferCreateInfo framebufferInfo{};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         framebufferInfo.renderPass = renderPass_;
-        framebufferInfo.attachmentCount = 1;
+        framebufferInfo.attachmentCount = 2;
         framebufferInfo.pAttachments = attachments;
         framebufferInfo.width = swapchainExtent_.width;
         framebufferInfo.height = swapchainExtent_.height;
