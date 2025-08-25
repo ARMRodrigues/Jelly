@@ -54,6 +54,7 @@ set(HEADERS
     ${HEADER_DIR}/core/camera.hpp
     ${HEADER_DIR}/core/transform_system.hpp
     ${HEADER_DIR}/core/camera_system.hpp
+    ${HEADER_DIR}/core/game_time.hpp
     ${HEADER_DIR}/graphics/graphic_api_interface.hpp
     ${HEADER_DIR}/graphics/graphic_api_factory.hpp
     ${HEADER_DIR}/graphics/graphic_context.hpp
